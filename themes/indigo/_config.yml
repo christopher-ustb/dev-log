@@ -13,6 +13,8 @@ menu:
     url: /
   archives:
     url: /archives
+  # categories:
+  #   url: /categories
   tags:
     url: /tags
   github:
@@ -25,7 +27,7 @@ menu:
 rss: /atom.xml
 
 #你的头像url
-avatar: /img/logo.jpg
+avatar: /dev-log/img/logo.jpg
 
 # email
 email: wangchao_ustb_2012@163.com
