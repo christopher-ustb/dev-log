@@ -4,16 +4,16 @@
 
 # Site
 title: Develop-log
-subtitle:
-description:
+subtitle: 魁主编的全栈训练营
+description: 水货开发者的鱼塘遨游日志
 author: Christopher.Wang
 language:
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
-root: /
+url: https://christopher-ustb.github.io/dev-log/
+root: /dev-log/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -68,4 +68,6 @@ theme: indigo
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:christopher-ustb/dev-log.git
+  branch: gh-pages
