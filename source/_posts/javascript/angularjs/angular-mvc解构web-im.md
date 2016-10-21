@@ -87,7 +87,7 @@ directive:
     * url 图片地址
 
 此处假定将聊天数据模型设计在一个对象中，其属性及原型主要有如下：
-
+* connection 维护了实际的聊天连接
 * me proto:Contact
 * chatting proto:Contact 当前正在与之聊天的联系人
 * timelines proto:Object[]
@@ -101,6 +101,7 @@ directive:
 
 * init() 初始化
     * initMe() 初始化me
+    * initConnection() 初始化WebSocket连接
 * receiveMsg(msg) 接收到信息
     * timelines.pushIfNotExisted() 如果需要的话添加新的timeline
     * timelines.findByContact(msg.from).msgs.push(msg) 找到对应的timeline并将msg加入其中
@@ -117,8 +118,9 @@ directive:
     作为整个聊天组件的最高层外包装，负责了所有与外部组件的交互动作，主要包括
     
     * 初始化im连接
-    * 收到消息 
     * 用户想与特定的人聊天或者只是想打开聊天窗体
+        
+        此处运用了一个angular的解耦思想：当事件发布者与事件监听者的父子关系无法确定时，借助顶级作用域发送事件，并且处理者自行订阅该事件，实现基于事件机制的松耦合。
    
 * chat-contacts-bar controller
     
@@ -133,4 +135,10 @@ directive:
     
     * 选中了某个表情，将数据传递给wrapper
     
+## service服务层定义全局事件
+
+在全局中设置了一些全局事件传播的传播api，目前设计了如下：
+
+* chat 打开聊天窗体，与某人聊天
+* remindUnreadMsg 提醒监听者，出现了未读消息，执行比如显示小红点等页面行为
     
