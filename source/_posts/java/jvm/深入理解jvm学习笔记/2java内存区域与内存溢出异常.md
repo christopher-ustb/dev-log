@@ -6,6 +6,7 @@ categories:
 tags:
 - java
 - jvm
+- 读书笔记
 ---
 
 # java内存区域与内存溢出异常
