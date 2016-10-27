@@ -1,5 +1,5 @@
 ---
-title: 一次看似诡异的maven依赖导致NoSuchMethodError异常
+title: 一次看似诡异的maven依赖导致NoSuchFieldError异常
 date: 2016-10-27 16:33:40
 categories: 
 - Java
@@ -8,7 +8,7 @@ tags:
 - maven
 ---
 
-# 一次看似诡异的maven依赖导致NoSuchMethodError异常
+# 一次看似诡异的maven依赖导致NoSuchFieldError异常
 
 ## 问题背景
 
