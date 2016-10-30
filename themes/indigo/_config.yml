@@ -13,10 +13,11 @@ menu:
     url: /
   archives:
     url: /archives
-  # categories:
-  #   url: /categories
   tags:
     url: /tags
+  th-list:
+    text: Categories
+    url: /categories
   github:
     url: https://github.com/christopher-ustb
     target: _blank
@@ -28,6 +29,8 @@ rss: /atom.xml
 
 #你的头像url
 avatar: /dev-log/img/logo.jpg
+#favicon
+favicon: /favicon.ico
 
 # email
 email: wangchao_ustb_2012@163.com
@@ -35,9 +38,10 @@ email: wangchao_ustb_2012@163.com
 # 设置 Android L Chrome 浏览器状态栏颜色
 color: '#3F51B5'
 
-# Content
-tags:
-  title: 标签
+# 页面标题
+tags_title: Tags
+archives_title: Archives
+categories_title: Categories
 
 # 文章截断
 excerpt_render: false
@@ -66,12 +70,15 @@ hideMenu: true
 toc:
   list_number: true  # 是否显示数字排序
 
+#文章页版权声明内容，hexo中所有变量及辅助函数等均可调用，具体请查阅 hexo.io
+copyright: 这里写留言或版权声明：<a href="<%- url_for(page.path).replace(/index\.html$/, '') %>" target="_blank" rel="external"><%- url.replace(/index\.html$/, '') %></a>
+
 #站长统计，如要开启，输入CNZZ站点id，如 cnzz: 1255152447
 cnzz: false
 
 # Miscellaneous
-google_analytics: ''
-favicon: /favicon.ico
+google_analytics: false
+google_site_verification: false
 
 # less
 less:
@@ -80,5 +87,13 @@ less:
     - source/css/style.less
 
 #是否开启多说评论，填写你在多说申请的项目名称 duoshuo: duoshuo-key
-#若使用disqus，请在博客config文件中填写disqus_shortname，并关闭多说评论
+#主题内置github风格多说样式，基于多说 BlueBox 主题修改，需要在多说后台设置中修改外观主题
 duoshuo: christopher-ustb
+#若使用disqus，请在博客config文件中填写disqus_shortname，并关闭多说评论
+disqus_shortname: false
+
+# 规范网址
+# 让搜索引擎重定向你的不同域名、不同子域、同域不同目录的站点到你期望的路径
+# https://support.google.com/webmasters/answer/139066
+# 假设配置为 canonical: http://imys.net，那么从搜索引擎中 www.imys.net 进入会重定向到 imys.net
+canonical: false

@@ -132,7 +132,6 @@ label {
     vertical-align: middle;
 }
 
-em,
 i {
     font-style: normal;
 }
@@ -206,11 +205,12 @@ a {
     background-image: none;
     color: @primaryColor;
     text-decoration: none;
+    outline: 0;
 }
 
 a:hover {
     color: @darkPrimaryColor;
-    outline: 0;
+    text-decoration: underline;
 }
 
 hr,
@@ -381,3 +381,4 @@ hr,
 @import '_partial/highlight';
 @import '_partial/search';
 @import '_partial/reward';
+@import '_partial/duoshuo.less';

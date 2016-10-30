@@ -1,1 +1,4 @@
-<%- partial('archive', {pagination: config.archive}) %>
+<%- partial('tags', {
+    pagination: config.archive,
+    title: theme.tags_title + ': '+ _.capitalize(page.tag)
+}) %>
