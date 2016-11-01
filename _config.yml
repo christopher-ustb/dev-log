@@ -71,3 +71,37 @@ deploy:
   type: git
   repo: git@github.com:christopher-ustb/dev-log.git
   branch: gh-pages
+
+jsonContent:
+  meta: true
+  keywords: false # (english, spanish, polish, german, french, italian, dutch, russian, portuguese, swedish)
+  pages:
+    title: true
+    slug: true
+    date: true
+    updated: true
+    comments: true
+    path: true
+    link: true
+    permalink: true
+    excerpt: true
+    keywords: true # but only if root keywords option language was set
+    text: true
+    raw: false
+    content: false
+  posts:
+    title: true
+    slug: true
+    date: true
+    updated: true
+    comments: true
+    path: true
+    link: true
+    permalink: true
+    excerpt: true
+    keywords: true # but only if root keywords option language was set
+    text: true
+    raw: false
+    content: false
+    categories: true
+    tags: true
