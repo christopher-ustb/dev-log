@@ -23,6 +23,21 @@ CATALINA_BASE /var/lib/tomcat7
 
 ## apt-get install nginx
 
+低版本nginx不支持always关键字，但是Ubuntu的中央repository最新nginx版本是1.4.6，
+必须添加[PPA](https://en.wikipedia.org/wiki/Personal_Package_Archive)更新nginx版本。
+
+```bash
+# 安装software-properties-common管理Ubuntu软件应用安装来源信任，允许管理分布式和个人软件资源。
+$ apt-get install software-properties-common
+$ apt-get install python-software-properties
+# 将nginx/stable的ppa加入信任
+$ add-apt-repository ppa:nginx/stable
+# 更新package list
+$ apt-get update
+# 升级或安装nginx
+$ apt-get upgrade nginx/apt-get install nginx
+```
+
 nginx所有配置在目录：/etc/nginx/
 日志文件目录：/var/log/nginx/
 
