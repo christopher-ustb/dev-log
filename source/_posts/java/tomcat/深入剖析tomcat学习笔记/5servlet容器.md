@@ -99,6 +99,3 @@ wrapper级别容器代表一个web应用部署后独立的servlet定义，并且
 ## Context
 
 大部分的web应用中，需要多个servlet合作，这时需要的servlet容器是Context，而不是Wrapper。
-
-
-
