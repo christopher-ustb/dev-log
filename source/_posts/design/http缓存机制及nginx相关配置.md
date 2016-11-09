@@ -125,6 +125,35 @@ tags:
     
 具体的实现方式可以想见的是发送不同的请求头。
 
+## 缓存策略的选择
+
+对大多数站点来说，以下内容是非常适合缓存的：
+
+* 普通不变的图像，如logo，图标等
+* js、css静态文件
+* 可下载的内容，媒体文件
+
+这些文件很少改变，适合长时间强缓存。
+
+以下内容是做缓存时需要注意的，建议主要使用协商缓存的：
+
+* HTML文件
+* 经常替换的图片
+* 经常修改的js、css文件
+
+其中，js、css文件可以通过md5修改文件名的方式改变url来失效缓存，
+即在文件内容变化后将main.95d21235.css改为main.1bcbf5de.css，由于url变化，所以不存在缓存的问题。
+
+以下内容从来都不应该使用缓存：
+
+* 用户隐私等敏感数据
+* 经常改变的api数据接口
+
+其中，后台rest api数据接口的如果需要引入缓存策略，必须要进行比较谨慎的规划，
+将频繁改变的接口与基本不变的接口区分，并且在应用服务器中实现Last-Modified/ETag的生成机制以保证缓存不会造成错误的结果。
+
+从这里延伸出去的话，理想情况下，一切网络资源都应该尽可能选择不同策略的缓存，但考虑到开发的成本与难度，这在现实中很难发生，因此应该尝试设置一些明智的缓存策略（最常见的就是给大量的静态图片设置缓存），以在长期缓存和站点改变的需求间达到平衡。
+
 ## nginx配置缓存策略
 
 * 强缓存相关配置
@@ -172,6 +201,7 @@ tags:
 * https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn
 * http://web.jobbole.com/84888/
 * http://nginx.org/en/docs/http/ngx_http_headers_module.html
+* https://linux.cn/article-5456-1.html
     
     
     
