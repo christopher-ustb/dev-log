@@ -25,8 +25,8 @@ menu:
     url: https://github.com/christopher-ustb
     target: _blank
   link:
-    text: 测试
-    url: /404
+    text: 致谢
+    url: /thanks
 
 rss: /atom.xml
 
