@@ -43,10 +43,11 @@ tags:
 
 6. 本地产生SSH公钥与私钥
 
-	* 在git-bash中运行: ssh-keygen -C "{{user.email}}" -t rsa(将{{user.email}}替换为上文中设置的git email)
+	* 在git-bash中运行: ssh-keygen -C "{% raw %}{{user.email}}{% endraw %}" -t rsa(将{% raw %}{{user.email}}{% endraw %}替换为上文中设置的git email)
 	* 一路enter后，windows系统在users\{{loginUser.name}}\.ssh目录下可以看到生成的公钥id_rsa.pub与私钥id_rsa文件
 
 7. 将公钥复制到Ubuntu上
+
 	* 追加到/home/git/.ssh/authorized_keys文件尾部（第一次复制需要手动创建该文件）
 	* github用户可将公钥添加到[github key设置页面](https://github.com/settings/keys)
 	
