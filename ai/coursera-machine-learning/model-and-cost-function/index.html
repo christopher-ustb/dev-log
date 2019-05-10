@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>模型和代价函数 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="ai,machine-learning,读书笔记">
+  <meta name="description" content="模型和代价函数模型表示方法约定x(i)表示输入变量(input variable)（即房地产例子中的房屋尺寸），y(i)表示输出或者目标变量(output/target variable)，即我们试图预测的（房价）。 一对(x(i), y(i))成为一个训练例。一系列我们用来机器学习的训练例的数据集，我们称之为训练集。 上标（我不会打上标，o(╥﹏╥)o）i表示训练集中的索引，与幂运算无关。 我们">
+<meta name="keywords" content="ai,machine-learning,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模型和代价函数">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/ai/coursera-machine-learning/model-and-cost-function/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="模型和代价函数模型表示方法约定x(i)表示输入变量(input variable)（即房地产例子中的房屋尺寸），y(i)表示输出或者目标变量(output/target variable)，即我们试图预测的（房价）。 一对(x(i), y(i))成为一个训练例。一系列我们用来机器学习的训练例的数据集，我们称之为训练集。 上标（我不会打上标，o(╥﹏╥)o）i表示训练集中的索引，与幂运算无关。 我们">
+<meta property="og:image" content="https://christopher-ustb.github.io/dev-log/images/ai/supervised-learning-process.png">
+<meta property="og:updated_time" content="2018-01-13T08:20:00.603Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="模型和代价函数">
+<meta name="twitter:description" content="模型和代价函数模型表示方法约定x(i)表示输入变量(input variable)（即房地产例子中的房屋尺寸），y(i)表示输出或者目标变量(output/target variable)，即我们试图预测的（房价）。 一对(x(i), y(i))成为一个训练例。一系列我们用来机器学习的训练例的数据集，我们称之为训练集。 上标（我不会打上标，o(╥﹏╥)o）i表示训练集中的索引，与幂运算无关。 我们">
+<meta name="twitter:image" content="https://christopher-ustb.github.io/dev-log/images/ai/supervised-learning-process.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">模型和代价函数</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">模型和代价函数</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#模型和代价函数"><span class="post-toc-number">1.</span> <span class="post-toc-text">模型和代价函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#模型表示方法"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">模型表示方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#代价函数"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">代价函数</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-ai/coursera-machine-learning/model-and-cost-function" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">模型和代价函数</h1>
+        <div class="post-meta">
+            <time datetime="2018-01-13T07:34:04.000Z" itemprop="datePublished" class="post-time">
+  2018-01-13
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/ai/">ai</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="模型和代价函数"><a href="#模型和代价函数" class="headerlink" title="模型和代价函数"></a>模型和代价函数</h1><h2 id="模型表示方法"><a href="#模型表示方法" class="headerlink" title="模型表示方法"></a>模型表示方法</h2><p>约定x(i)表示输入变量(input variable)（即房地产例子中的房屋尺寸），y(i)表示输出或者目标变量(output/target variable)，即我们试图预测的（房价）。</p>
+<p>一对(x(i), y(i))成为一个训练例。一系列我们用来机器学习的训练例的数据集，我们称之为训练集。</p>
+<p>上标（我不会打上标，o(╥﹏╥)o）i表示训练集中的索引，与幂运算无关。</p>
+<p>我们来更正式地描述监督式学习：我们的目标是，给定一个训练集，来学习得一个函数h: X -&gt; Y，以便h(x)能够很好地预测出对应的y值。由于历史原因，这个函数被称为假设(hypothesis)。</p>
+<p><img src="/dev-log/images/ai/supervised-learning-process.png" alt="supervised-learning-process"></p>
+<p>当我们试图预测的目标变量是连续的，就像我们的房价预测问题，我们将这个学习问题成为回归问题。</p>
+<p>当y只能取少数几个离散值，我们称之为分类问题。</p>
+<h2 id="代价函数"><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h2><p>我们可以通过代价函数(cost function)来衡量假设函数(hypothesis function)的精确性。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/ai/coursera-machine-learning/model-and-cost-function/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/ai/coursera-machine-learning/model-and-cost-function/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/ai/">ai</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/machine-learning/">machine-learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/Java读取jar包中文件夹内容/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java读取jar包中文件夹内容</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/ai/coursera-machine-learning/introduction/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">机器学习概论</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "模型和代价函数",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/ai/coursera-machine-learning/model-and-cost-function/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

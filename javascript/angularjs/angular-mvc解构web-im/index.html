@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>angular-mvc解构web-im | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="面向对象,angularjs">
+  <meta name="description" content="angular-mvc解构web-im问题背景之前喵书项目需要一个网页版即时通讯工具，即Web-im，只需要发文字信息跟图片，基本没有产品原型设计。考虑到服务器的分发能力，以及开发成本问题，最终选择了接入第三方即时通讯云服务器的方式，将开发工作的重点放在了前端上。 平心而论，这个任务其实是并没有什么困难的，无非是组织一下web im SDK的使用，难点都由第三方帮我们搞定了，总结这么一个文章对老鸟">
+<meta name="keywords" content="面向对象,angularjs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="angular-mvc解构web-im">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/javascript/angularjs/angular-mvc解构web-im/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="angular-mvc解构web-im问题背景之前喵书项目需要一个网页版即时通讯工具，即Web-im，只需要发文字信息跟图片，基本没有产品原型设计。考虑到服务器的分发能力，以及开发成本问题，最终选择了接入第三方即时通讯云服务器的方式，将开发工作的重点放在了前端上。 平心而论，这个任务其实是并没有什么困难的，无非是组织一下web im SDK的使用，难点都由第三方帮我们搞定了，总结这么一个文章对老鸟">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.871Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="angular-mvc解构web-im">
+<meta name="twitter:description" content="angular-mvc解构web-im问题背景之前喵书项目需要一个网页版即时通讯工具，即Web-im，只需要发文字信息跟图片，基本没有产品原型设计。考虑到服务器的分发能力，以及开发成本问题，最终选择了接入第三方即时通讯云服务器的方式，将开发工作的重点放在了前端上。 平心而论，这个任务其实是并没有什么困难的，无非是组织一下web im SDK的使用，难点都由第三方帮我们搞定了，总结这么一个文章对老鸟">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">angular-mvc解构web-im</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">angular-mvc解构web-im</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#angular-mvc解构web-im"><span class="post-toc-number">1.</span> <span class="post-toc-text">angular-mvc解构web-im</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#问题背景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#view显示层directive抽象"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">view显示层directive抽象</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#model数据层结构设计"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">model数据层结构设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#controller控制层方法定义"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">controller控制层方法定义</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#service服务层定义全局事件"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">service服务层定义全局事件</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-javascript/angularjs/angular-mvc解构web-im" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">angular-mvc解构web-im</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-20T06:16:51.000Z" itemprop="datePublished" class="post-time">
+  2016-10-20
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Javascript/">Javascript</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="angular-mvc解构web-im"><a href="#angular-mvc解构web-im" class="headerlink" title="angular-mvc解构web-im"></a>angular-mvc解构web-im</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>之前喵书项目需要一个网页版即时通讯工具，即Web-im，只需要发文字信息跟图片，基本没有产品原型设计。考虑到服务器的分发能力，以及开发成本问题，最终选择了接入第三方即时通讯云服务器的方式，将开发工作的重点放在了前端上。</p>
+<p>平心而论，这个任务其实是并没有什么困难的，无非是组织一下web im SDK的使用，难点都由第三方帮我们搞定了，总结这么一个文章对老鸟来说意义也很小。</p>
+<p>但在实际开发中，由于缺乏全局性的设计和组件式的划分，最终造成这个小小的功能代码十分糟糕，忍无可忍必须重构。</p>
+<p>以下主要记录一下思考的纲要图，另一方面，也简单做了一个mvc分层思想的demo。</p>
+<h2 id="view显示层directive抽象"><a href="#view显示层directive抽象" class="headerlink" title="view显示层directive抽象"></a>view显示层directive抽象</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">chat-window</span> <span class="attr">window-status</span>=<span class="string">"max/min/normal"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">chat-contacts-bar</span>&gt;</span><span class="tag">&lt;/<span class="name">chat-contacts-bar</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"chat-timeline-wrapper"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">chat-timeline</span> <span class="attr">active</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">chat-msg</span>&gt;</span>aloha<span class="tag">&lt;/<span class="name">chat-msg</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">chat-msg</span>&gt;</span>bye[bye]<span class="tag">&lt;/<span class="name">chat-msg</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">chat-timeline</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">chat-timeline</span>&gt;</span><span class="tag">&lt;/<span class="name">chat-timeline</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">chat-sender-wrapper</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">chat-emoji-sender</span>&gt;</span><span class="tag">&lt;/<span class="name">chat-emoji-panel</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">chat-image-sender</span>&gt;</span><span class="tag">&lt;/<span class="name">chat-image-sender</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">textarea</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">chat-sender-wrapper</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">chat-window</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>directive:</p>
+<ul>
+<li><p>chat-window </p>
+<p>  聊天窗体外壳，包含了聊天窗体的标题栏、外框等部分。</p>
+<p>  其scope维护了一个窗体状态（最大化、最小化、正常，如果需要拖拽聊天窗体则也在此保存left/top等位置）的参数</p>
+</li>
+<li><p>chat-contacts-bar</p>
+<p>  左侧的联系人列表，每个列表项目包含了联系人头像、昵称等内容显示。</p>
+<p>  其scope维护了自身的展开/收起状态。</p>
+</li>
+<li><p>chat-timeline</p>
+<p>  与某一个联系人的聊天时间线，包含了多个具体的聊天信息。</p>
+<p>  其scope维护了自身的显示/隐藏状态，这个状态也能够被外层作用域所改变，比如用户点击联系人头像，即切换了当前聊天对象。</p>
+</li>
+<li><p>chat-msg</p>
+<p>  单条聊天记录，包含了发起者的头像、昵称以及聊天内容。</p>
+<p>  这个指令应该能够自解析其内容，如表情及图片。</p>
+</li>
+<li><p>chat-sender-wrapper</p>
+<p>  整个聊天输入组件的外包装，包含了发送按钮。</p>
+</li>
+<li><p>chat-emoji-sender</p>
+<p>  聊天中使用到的emoji表情选择组件，包含表情按钮以及表情列表面板。</p>
+<p>  其scope维护了面板的展开/收起状态。</p>
+<p>  另外，其中由字符向表情图片的映射字典（如{‘[laugh]’: ‘images/faces/laugh.gif’}）应该依赖于外部常量模块，以保证与chat-msg解析表情数据的一致性。</p>
+</li>
+<li><p>chat-image-sender</p>
+<p>  发送图片的组件，如果比较简单可以直接用html原生的element</p>
+</li>
+</ul>
+<h2 id="model数据层结构设计"><a href="#model数据层结构设计" class="headerlink" title="model数据层结构设计"></a>model数据层结构设计</h2><p>此处数据层的设计，必须保存了的与业务逻辑耦合的数据，只标记组件的展示参数（典型的如组件的显隐）的参数不会在此处涉及，但不排除很多时候，组件的显示参数，是其背后业务数据发生变化的一种投射。</p>
+<p>先定义几个基本原型(Class)：</p>
+<ul>
+<li>Contact<ul>
+<li>username 发消息时唯一标识</li>
+<li>nickname 显示用的昵称</li>
+<li>avatar 头像</li>
+<li>initFromAppServer proto:Function 从数据库获取头像昵称信息</li>
+</ul>
+</li>
+<li>GenericMessage<ul>
+<li>from 谁发的</li>
+<li>to 发给谁</li>
+<li>timestamp 发送时间</li>
+<li>type 消息类型</li>
+<li>isFromMe(me) proto:Function 是否是我发的</li>
+</ul>
+</li>
+<li>TextMessage extends GenericMessage<ul>
+<li>text 文本内容</li>
+</ul>
+</li>
+<li>ImageMessage extends GenericMessage<ul>
+<li>url 图片地址</li>
+</ul>
+</li>
+</ul>
+<p>此处假定将聊天数据模型设计在一个对象中，其属性及原型主要有如下：</p>
+<ul>
+<li>connection 维护了实际的聊天连接</li>
+<li>me proto:Contact</li>
+<li>chatting proto:Contact 当前正在与之聊天的联系人</li>
+<li>timelines proto:Object[]<ul>
+<li>contact proto:Contact</li>
+<li>msgs proto:GenericMessage[]</li>
+</ul>
+</li>
+<li>inputtingMsg proto:String</li>
+<li>isChatWindowActive proto:Boolean</li>
+<li>hasUnreadMsg proto:Boolean</li>
+</ul>
+<p>该对象自身的行为：</p>
+<ul>
+<li>init() 初始化<ul>
+<li>initMe() 初始化me</li>
+<li>initConnection() 初始化WebSocket连接</li>
+</ul>
+</li>
+<li>receiveMsg(msg) 接收到信息<ul>
+<li>timelines.pushIfNotExisted() 如果需要的话添加新的timeline</li>
+<li>timelines.findByContact(msg.from).msgs.push(msg) 找到对应的timeline并将msg加入其中</li>
+<li>setChatting(msg.from)</li>
+<li>setHasUnreadMsg() 根据窗体的active情况设置hasUnread标识</li>
+</ul>
+</li>
+<li>toggleChatting(contact)</li>
+<li>sendMsg(msg)</li>
+</ul>
+<h2 id="controller控制层方法定义"><a href="#controller控制层方法定义" class="headerlink" title="controller控制层方法定义"></a>controller控制层方法定义</h2><ul>
+<li><p>chat-window controller</p>
+<p>  作为整个聊天组件的最高层外包装，负责了所有与外部组件的交互动作，主要包括</p>
+<ul>
+<li>初始化im连接</li>
+<li><p>用户想与特定的人聊天或者只是想打开聊天窗体</p>
+<p>  此处运用了一个angular的解耦思想：当事件发布者与事件监听者的父子关系无法确定时，借助顶级作用域发送事件，并且处理者自行订阅该事件，实现基于事件机制的松耦合。</p>
+</li>
+</ul>
+</li>
+<li><p>chat-contacts-bar controller</p>
+<ul>
+<li>点击列表单项切换当前聊天对象</li>
+<li>关闭单个聊天对象</li>
+</ul>
+</li>
+<li><p>chat-sender-wrapper controller</p>
+<ul>
+<li>点击发送按钮发消息</li>
+</ul>
+</li>
+<li><p>chat-emoji-sender</p>
+<ul>
+<li>选中了某个表情，将数据传递给wrapper</li>
+</ul>
+</li>
+</ul>
+<h2 id="service服务层定义全局事件"><a href="#service服务层定义全局事件" class="headerlink" title="service服务层定义全局事件"></a>service服务层定义全局事件</h2><p>在全局中设置了一些全局事件传播的传播api，目前设计了如下：</p>
+<ul>
+<li>chat 打开聊天窗体，与某人聊天</li>
+<li>remindUnreadMsg 提醒监听者，出现了未读消息，执行比如显示小红点等页面行为</li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/javascript/angularjs/angular-mvc解构web-im/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/javascript/angularjs/angular-mvc解构web-im/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/angularjs/">angularjs</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/面向对象/">面向对象</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/jvm/深入理解jvm学习笔记/6类文件结构/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">类文件结构</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java垃圾回收与内存分配策略</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "angular-mvc解构web-im",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/javascript/angularjs/angular-mvc解构web-im/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

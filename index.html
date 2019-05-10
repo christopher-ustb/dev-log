@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="undefined">
+  <meta name="description" content="水货开发者的鱼塘遨游日志">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Main.Weaver.Christopher.Diary">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="水货开发者的鱼塘遨游日志">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Main.Weaver.Christopher.Diary">
+<meta name="twitter:description" content="水货开发者的鱼塘遨游日志">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect active">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Main.Weaver.Christopher.Diary</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header index-header">
+
+    <div class="container">
+        <h1 class="title">Main.Weaver.Christopher.Diary</h1>
+        
+         
+        <h5 class="subtitle">
+            
+            
+                魁主编的全栈训练营
+            
+        </h5>
+        
+
+    </div>
+
+    
+
+</header>
+
+<div class="container body-wrap">
+
+    <ul class="post-list">
+    
+        <li class="post-list-item">
+            <article id="post-java/Java读取jar包中文件夹内容"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2019-05-10T01:56:08.000Z" itemprop="datePublished" class="post-time">
+  2019-05-10
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/Java读取jar包中文件夹内容/">Java读取jar包中文件夹内容</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        Java读取jar包中文件夹内容目标运行时列举/src/main/resources/configs目录下的所有文件
+错误示例12345File f = new File(this.getClass().getResource("/configs/").getPath());for(String s : f.list)&#123;   System.out.println(s);&#125;...
+    
+    
+        <a href="/dev-log/java/Java读取jar包中文件夹内容/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Java/">Java</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-ai/coursera-machine-learning/model-and-cost-function"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2018-01-13T07:34:04.000Z" itemprop="datePublished" class="post-time">
+  2018-01-13
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/ai/">ai</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/ai/coursera-machine-learning/model-and-cost-function/">模型和代价函数</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        模型和代价函数模型表示方法约定x(i)表示输入变量(input variable)（即房地产例子中的房屋尺寸），y(i)表示输出或者目标变量(output/target variable)，即我们试图预测的（房价）。
+一对(x(i), y(i))成为一个训练例。一系列我们用来机器学习的训练例的数据集，我们称之为训练集。
+上标（我不会打上标，o(╥﹏╥)o）i表示训练集中的索引，与幂运算无关。...
+    
+    
+        <a href="/dev-log/ai/coursera-machine-learning/model-and-cost-function/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/ai/">ai</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/machine-learning/">machine-learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-ai/coursera-machine-learning/introduction"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2018-01-07T06:28:38.000Z" itemprop="datePublished" class="post-time">
+  2018-01-07
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/ai/">ai</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/ai/coursera-machine-learning/introduction/">机器学习概论</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        概论什么是机器学习课程中提供了两种机器学习(Machine Learning)的定义：
+
+未经过显式编程，而让计算机拥有了学习的能力。
+从经验E(experience)学习，改善任务T(task)和性能度量P(performance measure)的程序。 比如说下棋： E=下很多盘棋的经验 T=下棋的任务 P=接下来一盘棋胜利的可能性
+
+总体来说，机器学习可以分为2类：
+
+监督式学习
+非...
+    
+    
+        <a href="/dev-log/ai/coursera-machine-learning/introduction/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/ai/">ai</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/machine-learning/">machine-learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/13显式锁"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-28T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-29
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/13显式锁/">显式锁</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        显式锁Lock与ReentrantLock12345678public interface Lock &#123;    void lock();    void lockInterruptibly() throws InterruptedException;    boolean tryLock();    boolean tryLock(long timeout, TimeUnit un...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/13显式锁/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-17T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-18
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/">性能与可伸缩性</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        性能与可伸缩性我们虽然希望提升性能，但始终要把安全性放在第一位。首先要保证程序能正确运行，然后仅当程序的性能需求和测试结果要求程序执行得更快时，才应该设法提高他的运行速度。
+对性能的思考多线程会引入一些额外的开销：
+
+线程之间的协调（锁、触发信号、内存同步等）
+增加的上下文切换
+线程的创建与销毁
+线程的调度
+
+想要通过并发来提升性能，需要做好2件事：更高效地利用现有处理资源，以及出现新的处理...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-14T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-15
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/">避免活跃性危险</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        避免活跃性危险死锁“哲学家进餐”问题描述了死锁：每个人都拥有其他人需要的资源，同时又等待其他人已经拥有的资源，并且每个人在获得所有需要的资源之前都不会放弃已经拥有的资源。
+线程A持有锁L并想获得锁M的同时，线程B持有锁M并尝试获得锁L，那么这两个线程将永远地等待下去，这种情况就是最简单的死锁形式（或称为“抱死”Deadly Embrace）。
+数据库设计中考虑了监测死锁以及从死锁中恢复。发生...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/8线程池的使用"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-09T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-10
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/">线程池的使用</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        线程池的使用在任务与执行策略之间的隐形耦合虽然Executor框架为制定和修改执行策略都提供了很大的灵活性，但并非所有的任务都适用所有的执行策略。有些类型的任务需要明确制定执行策略：
+
+依赖性任务
+使用线程封闭机制的任务：必须单线程
+对响应时间敏感的任务
+适用ThreadLocal的任务
+
+线程饥饿死锁只要线程池中的任务需要无限期地等待一些必须由池中其他任务才能提供的资源或条件，例如某个任务...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/7取消与关闭"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-08T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-09
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/7取消与关闭/">取消与关闭</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        取消与关闭这一章超难，暂时读不懂。
+要使线程安全、快速、可靠地停止下来，并不是一件容易的事，Java没有提供任何机制来安全地终止线程。但Java提供了中断（Interruption），这是一种协作机制，能够使一个线程终止另一个线程的当前工作。
+一个行为良好的软件，与勉强运行的软件之间的最主要区别就是，行为良好的软件能很完善地处理失败、关闭和取消等过程。
+任务取消取消的原因：
+
+用户请求取消
+...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/7取消与关闭/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/6任务执行"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-07T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-08
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/6任务执行/">任务执行</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        任务执行在线程中执行任务串行地执行任务显式地为任务创建线程无限制创建线程的不足
+创建生命周期的开销非常高
+资源消耗
+稳定性
+
+Executor框架在Java类库中，任务执行的主要抽象不是Thread，而是Executor：
+123public interface Executor &#123;    void execute(Runnable command);&#125;
+Executor...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/6任务执行/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
+            <article id="post-java/concurrency/Java并发编程实战学习笔记/5基础构建模块"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2017-08-02T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-03
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/">基础构建模块</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        基础构建模块Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。
+同步容器类同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。
+这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。
+同步容器类的问题复合操作，如：迭代、跳转、条件运算...
+    
+    
+        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+    </ul>
+
+    
+<nav id="page-nav">
+    <div class="inner">
+    <span class="page-number current">1</span><a class="page-number" href="/dev-log/page/2/">2</a><a class="page-number" href="/dev-log/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/dev-log/page/7/">7</a><a class="extend next" rel="next" href="/dev-log/page/2/">下一页</a>
+    </div>
+</nav>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "Main.Weaver.Christopher.Diary",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

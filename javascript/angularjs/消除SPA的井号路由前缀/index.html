@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>消除SPA井号路由前缀 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="Javascript,angularjs">
+  <meta name="description" content="消除基于angularjs构建的单页面应用（SPA）路由上的#前缀 $locationProvider.html5mode(true)  $locationProvider.html5mode([mode])  mode:   type: Object  properties:  enabled-{boolean}-(default: false)，如果为true，会在支持history.push">
+<meta name="keywords" content="Javascript,angularjs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消除SPA井号路由前缀">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/javascript/angularjs/消除SPA的井号路由前缀/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="消除基于angularjs构建的单页面应用（SPA）路由上的#前缀 $locationProvider.html5mode(true)  $locationProvider.html5mode([mode])  mode:   type: Object  properties:  enabled-{boolean}-(default: false)，如果为true，会在支持history.push">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.871Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="消除SPA井号路由前缀">
+<meta name="twitter:description" content="消除基于angularjs构建的单页面应用（SPA）路由上的#前缀 $locationProvider.html5mode(true)  $locationProvider.html5mode([mode])  mode:   type: Object  properties:  enabled-{boolean}-(default: false)，如果为true，会在支持history.push">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">消除SPA井号路由前缀</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">消除SPA井号路由前缀</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#消除基于angularjs构建的单页面应用（SPA）路由上的-前缀"><span class="post-toc-number">1.</span> <span class="post-toc-text">消除基于angularjs构建的单页面应用（SPA）路由上的#前缀</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-javascript/angularjs/消除SPA的井号路由前缀" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">消除SPA井号路由前缀</h1>
+        <div class="post-meta">
+            <time datetime="2016-08-22T11:59:24.000Z" itemprop="datePublished" class="post-time">
+  2016-08-22
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Javascript/">Javascript</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="消除基于angularjs构建的单页面应用（SPA）路由上的-前缀"><a href="#消除基于angularjs构建的单页面应用（SPA）路由上的-前缀" class="headerlink" title="消除基于angularjs构建的单页面应用（SPA）路由上的#前缀"></a>消除基于angularjs构建的单页面应用（SPA）路由上的#前缀</h1><ol>
+<li><p>$locationProvider.html5mode(true)</p>
+<p> $locationProvider.html5mode([mode])</p>
+<p> mode: </p>
+<p> type: Object</p>
+<p> properties:</p>
+<ul>
+<li>enabled-{boolean}-(default: false)，如果为true，会在支持history.pushState的浏览器依靠pushState来改变url，在不支持pushState的浏览器会变回#前缀的路径</li>
+<li>requireBase-{boolean}-(default: true)，如果html5mode被使用，此参数指定是否需要呈现一个base标签。如果enabled requireBase都设置为true，并且没有base标签，那么在注入$location时angular会抛出错误</li>
+<li><p>rewriteLinks-{boolean}-(default: true)，是否重写html5mode下的相对路径</p>
+<p>type: boolean</p>
+<p>只设置enabled</p>
+</li>
+</ul>
+</li>
+<li><p><code>&lt;head&gt;</code>中增加<code>&lt;base href=&quot;/&quot;&gt;</code>指定base路径</p>
+</li>
+<li><p>刷新页面时给出get请求错误</p>
+<blockquote>
+<p>Cannot GET /detail?workid=4</p>
+</blockquote>
+<p> 3.1. 出现原因</p>
+<p> 当第一次访问页面/detail，就是刷新页面后，浏览器无从得知这是否是一个真的url还是html5的state。<br> 所以浏览器直接去服务器寻址，并返回了404的错误。</p>
+<p> 然而，如果根页面（index.html）以及所以的javascript代码全部加载完成，此时尝试导航到/detail，angular就能在浏览器尝试寻址服务器之前迅速地导航到该state。</p>
+<p> 详见<a href="http://stackoverflow.com/questions/16569841/reloading-the-page-gives-wrong-get-request-with-angularjs-html5-mode" target="_blank" rel="noopener">stackoverflow</a></p>
+<p> 3.2. 此处的关键，在于将服务器上未解决的请求转移到SPA的根路径</p>
+</li>
+<li><p>mod rewrite</p>
+<p> <a href="http://httpd.apache.org/docs/current/mod/mod_rewrite.html" target="_blank" rel="noopener">mod_rewrite</a>是Apache web server的一个默认模块，篡改浏览器提交的url请求，并传递内容给浏览器。</p>
+<p> 这个过程完全发生在服务端，浏览器毫不知情。结果页面就好像是源于提交的url（实际上不是），就像给源url带了一个面具。</p>
+<p> 然而，这个功能跟经典的重定向是不同的，重定向只是简单地指挥浏览器跳转到另一个不同的服务器地址。</p>
+<p> 由于mod rewrite有效地伪装了网站内容是从哪里、如何服务的，所以能提高网站安全性。由于静态化了网站路径，也能够用做搜索引擎优化。</p>
+</li>
+<li><p><a href="https://github.com/tinganho/connect-modrewrite" target="_blank" rel="noopener">grunt plugin: connect-modrewrite</a></p>
+<p> 参考<a href="http://stackoverflow.com/questions/24283653/angularjs-html5mode-using-grunt-connect-grunt-0-4-5" target="_blank" rel="noopener">http://stackoverflow.com/questions/24283653/angularjs-html5mode-using-grunt-connect-grunt-0-4-5</a></p>
+<p> connect-modrewrite表达式的详细规则见于<a href="https://github.com/tinganho/connect-modrewrite" target="_blank" rel="noopener">github</a></p>
+<p> 在Gruntfile.js中connect中增加一个middleware:</p>
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">livereload: &#123;</span><br><span class="line">    options: &#123;</span><br><span class="line">      open: true,</span><br><span class="line">      middleware: function (connect) &#123;</span><br><span class="line">        return [</span><br><span class="line">            // mod rewrite all request to /index.html</span><br><span class="line">          modRewrite([&apos;^[^\\.]*$ /index.html [L]&apos;]),</span><br><span class="line">          connect.static(&apos;.tmp&apos;),</span><br><span class="line">          connect().use(</span><br><span class="line">            &apos;/bower_components&apos;,</span><br><span class="line">            connect.static(&apos;./bower_components&apos;)</span><br><span class="line">          ),</span><br><span class="line">          connect.static(appConfig.app)</span><br><span class="line">        ];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</code></pre></li>
+<li><p>nginx config</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name yoursite.com;</span><br><span class="line">    root /usr/share/html;</span><br><span class="line">    index index.html;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">    try_files $uri $uri/ /index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/javascript/angularjs/消除SPA的井号路由前缀/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/javascript/angularjs/消除SPA的井号路由前缀/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Javascript/">Javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/angularjs/">angularjs</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/非环形依赖与依赖倒置原则/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">非环形依赖与依赖倒置原则</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/linux/nginx配置CORS服务/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">nginx配置CORS服务</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "消除SPA井号路由前缀",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/javascript/angularjs/消除SPA的井号路由前缀/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

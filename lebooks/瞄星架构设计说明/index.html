@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>瞄星架构设计说明 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="lebooks-private">
+  <meta name="description" content="瞄星架构设计说明 关键技术： nginxjavatomcat7Restful apimavenspringhibernatemysqlredisnpmangularjsyeomanbower grunt动静分离动静分离的优点动静分离是让动态网站里的动态网页根据一定规则把不变的资源（html,css,js,静态文件）和经常变的资源（数据资源）区分开来。  提高静态资源访问速度，后端不用再将模板渲染为">
+<meta name="keywords" content="lebooks-private">
+<meta property="og:type" content="article">
+<meta property="og:title" content="瞄星架构设计说明">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/lebooks/瞄星架构设计说明/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="瞄星架构设计说明 关键技术： nginxjavatomcat7Restful apimavenspringhibernatemysqlredisnpmangularjsyeomanbower grunt动静分离动静分离的优点动静分离是让动态网站里的动态网页根据一定规则把不变的资源（html,css,js,静态文件）和经常变的资源（数据资源）区分开来。  提高静态资源访问速度，后端不用再将模板渲染为">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="瞄星架构设计说明">
+<meta name="twitter:description" content="瞄星架构设计说明 关键技术： nginxjavatomcat7Restful apimavenspringhibernatemysqlredisnpmangularjsyeomanbower grunt动静分离动静分离的优点动静分离是让动态网站里的动态网页根据一定规则把不变的资源（html,css,js,静态文件）和经常变的资源（数据资源）区分开来。  提高静态资源访问速度，后端不用再将模板渲染为">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">瞄星架构设计说明</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">瞄星架构设计说明</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#瞄星架构设计说明"><span class="post-toc-number">1.</span> <span class="post-toc-text">瞄星架构设计说明</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#grunt"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">grunt</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#动静分离"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">动静分离</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#动静分离的优点"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">动静分离的优点</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#瞄星中动静分离的实现手段"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">瞄星中动静分离的实现手段</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#前端开发"><span class="post-toc-number">1.2.2.1.</span> <span class="post-toc-text">前端开发</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#后端开发"><span class="post-toc-number">1.2.2.2.</span> <span class="post-toc-text">后端开发</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#跨域处理"><span class="post-toc-number">1.2.2.3.</span> <span class="post-toc-text">跨域处理</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前端框架"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">前端框架</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#前端MVC、模块化、数据绑定"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">前端MVC、模块化、数据绑定</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#项目骨架生成"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">项目骨架生成</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#包管理工具"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">包管理工具</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#自动化"><span class="post-toc-number">1.3.4.</span> <span class="post-toc-text">自动化</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#路由管理"><span class="post-toc-number">1.3.5.</span> <span class="post-toc-text">路由管理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ui框架"><span class="post-toc-number">1.3.6.</span> <span class="post-toc-text">ui框架</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#后端框架"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">后端框架</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Restful-api"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">Restful api</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Web-MVC-framework"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">Web MVC framework</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Maven"><span class="post-toc-number">1.4.3.</span> <span class="post-toc-text">Maven</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#其他常规java框架"><span class="post-toc-number">1.4.4.</span> <span class="post-toc-text">其他常规java框架</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据库"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">数据库</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#mysql"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">mysql</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#redis"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">redis</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">其他</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#api-doc"><span class="post-toc-number">1.6.1.</span> <span class="post-toc-text">api doc</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-lebooks/瞄星架构设计说明" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">瞄星架构设计说明</h1>
+        <div class="post-meta">
+            <time datetime="2016-09-03T13:16:24.000Z" itemprop="datePublished" class="post-time">
+  2016-09-03
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="瞄星架构设计说明"><a href="#瞄星架构设计说明" class="headerlink" title="瞄星架构设计说明"></a>瞄星架构设计说明</h1><hr>
+<p>关键技术：</p>
+<p><code>nginx</code><br><code>java</code><br><code>tomcat7</code><br><code>Restful api</code><br><code>maven</code><br><code>spring</code><br><code>hibernate</code><br><code>mysql</code><br><code>redis</code><br><code>npm</code><br><code>angularjs</code><br><code>yeoman</code><br><code>bower</code></p>
+<h2 id="grunt"><a href="#grunt" class="headerlink" title="grunt"></a><code>grunt</code></h2><h2 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h2><h3 id="动静分离的优点"><a href="#动静分离的优点" class="headerlink" title="动静分离的优点"></a>动静分离的优点</h3><p>动静分离是让动态网站里的动态网页根据一定规则把不变的资源（html,css,js,静态文件）和经常变的资源（数据资源）区分开来。</p>
+<ul>
+<li>提高静态资源访问速度，后端不用再将模板渲染为html返回给用户端，且静态服务器可以采用更为专业的技术提高静态资源的访问速度。</li>
+<li>后端应用更为服务化，只需要通过提供api接口即可，可以为多个功能模块甚至是多个平台的功能使用，可以有效的节省后端人力，更便于功能维护。</li>
+<li>前后端可以并行开发。</li>
+<li>修改前端页面后，不再需要重新部署整个服务，只需要替换相关文件即可。</li>
+</ul>
+<h3 id="瞄星中动静分离的实现手段"><a href="#瞄星中动静分离的实现手段" class="headerlink" title="瞄星中动静分离的实现手段"></a>瞄星中动静分离的实现手段</h3><h4 id="前端开发"><a href="#前端开发" class="headerlink" title="前端开发"></a>前端开发</h4><p>此项目中直接使用<code>SPA</code>(Single Page Application)，整个站点只有index.html一个路由，前端的状态依靠js来操作，和后端用ajax传送json交互的数据</p>
+<p>使用nginx serve本地静态资源(包括前端页面以及其他图片等静态资源)</p>
+<h4 id="后端开发"><a href="#后端开发" class="headerlink" title="后端开发"></a>后端开发</h4><p>后端提供RestFul API ，处理前端请求以json形式返回。<br>此项目中采用tomcat7服务器，并使用nginx反向代理</p>
+<h4 id="跨域处理"><a href="#跨域处理" class="headerlink" title="跨域处理"></a>跨域处理</h4><blockquote>
+<p>动静分离因为静态资源和应用服务分别部署在不同的服务器上，因此会面临域名策略的选择。</p>
+</blockquote>
+<p>此项目采用nginx反向代理将前后端映射到相同的域名下，暂时避免了跨域请求。</p>
+<p><code>更新</code></p>
+<p>由于网站需要多域名访问，如无论是否包含www的前缀都可以访问，跨域请求难以避免。</p>
+<p><a href="../linux/nginx配置CORS服务.md">使用nginx add_header方式建立CORS的api服务</a></p>
+<hr>
+<h2 id="前端框架"><a href="#前端框架" class="headerlink" title="前端框架"></a>前端框架</h2><h3 id="前端MVC、模块化、数据绑定"><a href="#前端MVC、模块化、数据绑定" class="headerlink" title="前端MVC、模块化、数据绑定"></a>前端MVC、模块化、数据绑定</h3><p>angularjs</p>
+<ul>
+<li><p>dom指令</p>
+<p>  以命令式编程的思想拓展html词汇表，高度封装页面组件（如导航条，聊天窗等），达到更具可读性的组件复用。</p>
+<p>  将dom操作交给directive!</p>
+</li>
+<li><p>模块化</p>
+<p>  主要以功能为划分标准，如分为作者、作品、订单等，交叉部分依赖注入。</p>
+</li>
+<li><p>前端mvc</p>
+<p>  单个功能模块内，将代码以mvc为标准解耦，以接口隔离的思想：</p>
+<ul>
+<li>view层主要考虑页面显示；</li>
+<li>controller层只考虑页面的基础动作，如菜单的打开关闭、输入框的激活失焦等；</li>
+<li>model层主要负责真正的业务数据（而不是页面动作的临时数据），通常表现为需要与服务器接口交互的数据，以及将该模型本身业务逻辑的行为定义为其原型链上的方法；</li>
+<li>将可复用的基础服务（如身份验证、文件处理等）抽象为angular的service(provider)</li>
+<li>在实现每一层的时候，只实现自己的功能，依赖低层的地方需抽象为接口（以这种方式思考，js不需要显示定义抽象接口），即依赖接口而不依赖实现；</li>
+</ul>
+</li>
+<li><p>数据绑定</p>
+<p>  双向绑定，便于更敏捷地开发。</p>
+</li>
+</ul>
+<h3 id="项目骨架生成"><a href="#项目骨架生成" class="headerlink" title="项目骨架生成"></a>项目骨架生成</h3><p><a href="http://yeoman.io/" target="_blank" rel="noopener">yeoman</a></p>
+<p>yeoman首页上的Slogan深深地吸引了我，The web’s scaffolding tool for modern webapps。yeoman的魅力在于提供了丰富的<a href="http://yeoman.io/generators/" target="_blank" rel="noopener">generator</a>，可谓无所不有且十分傻瓜，恨不能不会写前端的人拿了yeoman也会依葫芦画瓢写出个网站。</p>
+<p>此项目我选用了<a href="https://github.com/yeoman/generator-angular" target="_blank" rel="noopener">AngularJs generator</a>，一键安装基于angularjs的SPA应用</p>
+<h3 id="包管理工具"><a href="#包管理工具" class="headerlink" title="包管理工具"></a>包管理工具</h3><p><a href="https://bower.io/" target="_blank" rel="noopener">bower</a></p>
+<p>类似于java世界的maven或gradle，以模块化思想管理包及其之间的依赖关系（传递依赖、版本冲突等），将包名与版本号加入bower.json中，可自动去github中央仓库下载所需文件</p>
+<h3 id="自动化"><a href="#自动化" class="headerlink" title="自动化"></a>自动化</h3><p><a href="http://www.gruntjs.net/" target="_blank" rel="noopener">grunt</a></p>
+<p>javascript世界的构建工具，众多功能细小可组合的开源Task，且可由yeoman自动生成gruntfile，包含了监测文件变化自动热部署，内置server，js检错jshint，代码风格管理，压缩、连接、丑化源代码等等功能，使用了grunt自动化之后的webapp简直就是重机枪与大刀长矛的区别。</p>
+<h3 id="路由管理"><a href="#路由管理" class="headerlink" title="路由管理"></a>路由管理</h3><p><a href="https://github.com/angular-ui/ui-router" target="_blank" rel="noopener">AngularUI Router</a>，以层叠的状态树为模型构建单页应用。</p>
+<p><a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="_blank" rel="noopener">有限状态机</a>思想管理页面状态</p>
+<p>解决了angular自带ngRouter的两个痛点：嵌套视图与单状态多视图</p>
+<h3 id="ui框架"><a href="#ui框架" class="headerlink" title="ui框架"></a>ui框架</h3><p><a href="https://github.com/angular/material" target="_blank" rel="noopener">angular.material</a></p>
+<p>google官方出品的基于angular的material design实现，提供了丰富的基础组件，快速构建应用。</p>
+<hr>
+<h2 id="后端框架"><a href="#后端框架" class="headerlink" title="后端框架"></a>后端框架</h2><h3 id="Restful-api"><a href="#Restful-api" class="headerlink" title="Restful api"></a>Restful api</h3><p>REST: Representational State Transfer，不知道怎么翻译成人类的语言。</p>
+<p>我对REST的理解比较浅显：</p>
+<ul>
+<li>一切网络信息都被看做是资源，并且有一个id，对应于调用它的URI</li>
+<li>对资源的访问操作，对应于请求的操作动词：get/post/put/delete</li>
+<li>难以对应于资源的操作，也应该名词化，如修改我的密码，我的endpoint设计是put /mine/password（这只是我比较能接受的设计，stackoverflow上对这个问题有激烈争论）</li>
+<li>状态码status code也是响应的一部分，应该恰当地表达响应的状态（不能无脑200）</li>
+<li>应该建立易读易懂的错误信息体系告诉客户端错误</li>
+<li>返回结果应与请求一致，且不言自明</li>
+</ul>
+<p>TODO <code>幂等性</code>,<code>https</code>,<code>版本管理</code></p>
+<p>此处强烈推荐<a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">阮一峰大神的网络开发日志-RESTful API 设计指南</a></p>
+<h3 id="Web-MVC-framework"><a href="#Web-MVC-framework" class="headerlink" title="Web MVC framework"></a>Web MVC framework</h3><p>spring mvc4.0，基于注解的访问路由、参数处理，利用org.springframework.http.ResponseEntity快速实例化包含http status code和response body的响应。</p>
+<p>另外，大部分java开发者对spring都非常熟悉</p>
+<h3 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h3><p>必须承认，最开始的设计，是没有准备引入maven来管理项目的，一是团队其他开发人员对maven并不熟悉，二是微信书项目也没有使用maven。</p>
+<p>但是在开发过程中，有几个痛点：</p>
+<ol>
+<li>jar包下载繁琐、版本冲突，并且把jar包放在git里实在是太蠢了</li>
+<li>跟微信书几乎完全类似的代码，由于没有合理的控制依赖意识（本质还是开发者解耦意识较差），造成移植十分困难。希望引入maven来从硬件上约束开发者。</li>
+<li>BaseDao,BaseController,BaseEntity,BaseVo希望能够抽离，并限制为经验比较丰富的开发者才能修改</li>
+<li>一直重复的微信支付、支付宝支付没有写出自己的SDK</li>
+</ol>
+<p>于是在前端使用了bower后，一不做二不休，引入maven来管理项目</p>
+<h3 id="其他常规java框架"><a href="#其他常规java框架" class="headerlink" title="其他常规java框架"></a>其他常规java框架</h3><p>spring ioc管理java bean</p>
+<p>hibernate 做orm</p>
+<p>spring transaction管理数据库事务</p>
+<h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><h3 id="mysql"><a href="#mysql" class="headerlink" title="mysql"></a>mysql</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 我是井底之蛙，只用过oracle和mysql</span><br></pre></td></tr></table></figure>
+<h3 id="redis"><a href="#redis" class="headerlink" title="redis"></a>redis</h3><p>主要保存一下数据：</p>
+<ul>
+<li>身份校验token</li>
+<li>手机验证码</li>
+<li>用户密码输错次数</li>
+</ul>
+<p>不难看出，这些数据或对持久化到磁盘的要求很低，或对读写性能要求较高，或需要失效机制，将其保存在业务数据的关系型数据库中不是很合适，所以将其转移到NoSQL中。</p>
+<p>开始阶段这些数据直接保存在一个单例模式的变量中，本质是保存在方法区（静态区）内，这种保存方式读写更快，但是缺少失效机制，无法管理内存大小，在数据变多后迁移至redis中。</p>
+<p>与常常与之对比的memcached相比：</p>
+<ul>
+<li>redis具有更丰富的数据结构，如hash,sorted set,list等。</li>
+<li>redis可以持久化到磁盘</li>
+<li>单个value值大小上限为512m（memcached为1m）</li>
+<li>3.0版本的redis可以集群</li>
+<li>Memcached和redis都能当做内存键值缓存使用，但redis更能表现为一个数据结构的服务器。</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="api-doc"><a href="#api-doc" class="headerlink" title="api doc"></a>api doc</h3><p>以识别代码注释的方式生成api文档，样式美观，使用简单，支持java，强烈推荐</p>
+<p><a href="http://apidocjs.com/" target="_blank" rel="noopener">http://apidocjs.com/</a></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/lebooks/瞄星架构设计说明/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/lebooks/瞄星架构设计说明/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/lebooks-private/">lebooks-private</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java内存区域与内存溢出异常</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/lebooks/瞄星RestAPI整体代码设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">瞄星RestAPI整体代码设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "瞄星架构设计说明",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/lebooks/瞄星架构设计说明/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

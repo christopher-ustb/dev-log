@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>基于angular与nginx的SPA的SEO方案 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="nginx,SPA,SEO">
+  <meta name="description" content="基于angular与nginx的SPA的SEO方案问题背景出于动静分离的考虑，喵书项目选择了SPA(Single Page Application)，并且也从中尝到了很大的甜头：  用户体验好，响应速度快 前后分离，各司其职，并行开发 减轻服务器压力，主要输出数据 同一套后台代码可用于Web与app  同时，对于一个以生产内容为主的SPA，就面临了一个十分严峻的问题：SEO(search engi">
+<meta name="keywords" content="nginx,SPA,SEO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于angular与nginx的SPA的SEO方案">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/design/基于angular与nginx的SPA的SEO方案/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="基于angular与nginx的SPA的SEO方案问题背景出于动静分离的考虑，喵书项目选择了SPA(Single Page Application)，并且也从中尝到了很大的甜头：  用户体验好，响应速度快 前后分离，各司其职，并行开发 减轻服务器压力，主要输出数据 同一套后台代码可用于Web与app  同时，对于一个以生产内容为主的SPA，就面临了一个十分严峻的问题：SEO(search engi">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.848Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于angular与nginx的SPA的SEO方案">
+<meta name="twitter:description" content="基于angular与nginx的SPA的SEO方案问题背景出于动静分离的考虑，喵书项目选择了SPA(Single Page Application)，并且也从中尝到了很大的甜头：  用户体验好，响应速度快 前后分离，各司其职，并行开发 减轻服务器压力，主要输出数据 同一套后台代码可用于Web与app  同时，对于一个以生产内容为主的SPA，就面临了一个十分严峻的问题：SEO(search engi">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">基于angular与nginx的SPA的SEO方案</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">基于angular与nginx的SPA的SEO方案</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#基于angular与nginx的SPA的SEO方案"><span class="post-toc-number">1.</span> <span class="post-toc-text">基于angular与nginx的SPA的SEO方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#问题背景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Googlebot的协议"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Googlebot的协议</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#各种爬虫的兼容性难题"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">各种爬虫的兼容性难题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#用mod-rewrite自定协议"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">用mod_rewrite自定协议</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Prerender"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">Prerender</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考文献"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">参考文献</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-design/基于angular与nginx的SPA的SEO方案" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">基于angular与nginx的SPA的SEO方案</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-24T02:38:24.000Z" itemprop="datePublished" class="post-time">
+  2016-11-24
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="基于angular与nginx的SPA的SEO方案"><a href="#基于angular与nginx的SPA的SEO方案" class="headerlink" title="基于angular与nginx的SPA的SEO方案"></a>基于angular与nginx的SPA的SEO方案</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>出于动静分离的考虑，喵书项目选择了SPA(Single Page Application)，并且也从中尝到了很大的甜头：</p>
+<ul>
+<li>用户体验好，响应速度快</li>
+<li>前后分离，各司其职，并行开发</li>
+<li>减轻服务器压力，主要输出数据</li>
+<li>同一套后台代码可用于Web与app</li>
+</ul>
+<p>同时，对于一个以生产内容为主的SPA，就面临了一个十分严峻的问题：SEO(search engine optimization)。</p>
+<p>这个问题的本质其实是由于搜索引擎的爬虫不会执行网页的javascript代码，所有依靠javascript获取的数据、改变的dom元素都无法被收录，与SPA这种形式并没有关系，只是对SPA来说尤为突出。</p>
+<h2 id="Googlebot的协议"><a href="#Googlebot的协议" class="headerlink" title="Googlebot的协议"></a>Googlebot的协议</h2><p>google应该早就为开发者考虑到这个问题，所以googlebot（google搜索引擎的爬虫程序）为SPA开发者建立了一个协议，专门来解决javascript动态渲染的网站的爬取问题。</p>
+<p>googlebot会将<code>http://localhost:3000/#!/profiles/1234</code>改成<code>http://localhost:3000/?_escaped_fragment_=/profiles/1234</code>爬取。</p>
+<p>基于这个协议，只需要为带有<code>_escaped_fragment_</code>参数的请求提供不依靠javascript动态渲染的静态页面，就可以让爬虫拿到开发者希望被收录的数据。</p>
+<p>而phantomjs就是这个帮助开发者由动态渲染生成静态文件的，基于Webkit的服务端javascript API。在这里起到的作用，就是模拟用户的浏览器，来生成与用户所看到的页面类似的html页面。</p>
+<h2 id="各种爬虫的兼容性难题"><a href="#各种爬虫的兼容性难题" class="headerlink" title="各种爬虫的兼容性难题"></a>各种爬虫的兼容性难题</h2><p>如果只需要支持googlebot的爬取，那么基于上面的协议就已经能着手解决问题。</p>
+<p>但是，由于我们生活在一个特殊的国度，这里的搜索引擎不是google，而是百度、360、搜狗、有道等，以他们各自为战互相抹黑的态势，根本没办法保证他们遵守google的协议。</p>
+<p>所以必须采用各种搜索引擎都能兼容的方案，才能做出本土化的SEO方案。</p>
+<h2 id="用mod-rewrite自定协议"><a href="#用mod-rewrite自定协议" class="headerlink" title="用mod_rewrite自定协议"></a>用mod_rewrite自定协议</h2><p>检查http请求的user-agent，应该是最快的识别出搜索引擎网络爬虫的方法。</p>
+<p>再运用服务端的某种设置，就完全可以自己制定一个类似于Googlebot escaped fragment协议的协议（推荐直接相同）。</p>
+<p>实现原理如下：</p>
+<ol>
+<li>服务端检测http-request.user-agent是否是爬虫，如果不是，则正常返回用户页面；</li>
+<li>如果是网络爬虫，那么将经过一定规则改变的静态页面作为响应返回给爬虫。</li>
+</ol>
+<p>由于我们使用nginx提供服务，nginx配置范例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">    if ($http_user_agent ~* &apos;(Googlebot|Mediapartners-Google|AdsBot-Google|bingbot|Baiduspider|yahooseeker)&apos;) &#123;</span><br><span class="line">        rewrite ^(.*)$ /seo-site/$1;</span><br><span class="line">    &#125;</span><br><span class="line">    ...用户浏览器服务配置</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location /seo-site/ &#123;</span><br><span class="line">    ...静态页服务配置</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么问题就只剩下如何搭建这个提供静态页的服务，以及如何制定一个合理的rewrite规则来同时兼容SPA带#号的地址与HTML5模式不带#的地址了。</p>
+<h2 id="Prerender"><a href="#Prerender" class="headerlink" title="Prerender"></a>Prerender</h2><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://developers.google.com/webmasters/ajax-crawling/docs/specification" target="_blank" rel="noopener">google ajax crawling</a></p>
+<p><a href="http://seanlook.com/2015/05/17/nginx-location-rewrite/" target="_blank" rel="noopener">nginx配置location总结及rewrite规则写法</a></p>
+<p><a href="https://gist.github.com/thoop/8165802" target="_blank" rel="noopener">nginx配置范例</a></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/design/基于angular与nginx的SPA的SEO方案/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/design/基于angular与nginx的SPA的SEO方案/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/SEO/">SEO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/SPA/">SPA</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/nginx/">nginx</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/lebooks/利用浏览器优化排版算法的方案/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">利用浏览器优化排版算法的方案</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/lebooks/诗歌社区架构设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">诗歌社区架构设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "基于angular与nginx的SPA的SEO方案",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/design/基于angular与nginx的SPA的SEO方案/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

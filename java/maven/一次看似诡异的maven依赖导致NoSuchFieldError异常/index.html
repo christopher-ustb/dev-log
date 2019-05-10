@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>一次看似诡异的maven依赖导致NoSuchFieldError异常 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,maven">
+  <meta name="description" content="一次看似诡异的maven依赖导致NoSuchFieldError异常问题背景在使用maven多项目构建的web project打成war包，部署到tomcat后，发现有一个Enum class，其中的部分枚举属性一直不能访问（编译肯定能通过，否则无法打成WAR包），程序抛出java.lang.NoSuchFieldError异常。 java.lang.NoSuchFieldError的出现情况我猜">
+<meta name="keywords" content="java,maven">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次看似诡异的maven依赖导致NoSuchFieldError异常">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/maven/一次看似诡异的maven依赖导致NoSuchFieldError异常/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="一次看似诡异的maven依赖导致NoSuchFieldError异常问题背景在使用maven多项目构建的web project打成war包，部署到tomcat后，发现有一个Enum class，其中的部分枚举属性一直不能访问（编译肯定能通过，否则无法打成WAR包），程序抛出java.lang.NoSuchFieldError异常。 java.lang.NoSuchFieldError的出现情况我猜">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.862Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一次看似诡异的maven依赖导致NoSuchFieldError异常">
+<meta name="twitter:description" content="一次看似诡异的maven依赖导致NoSuchFieldError异常问题背景在使用maven多项目构建的web project打成war包，部署到tomcat后，发现有一个Enum class，其中的部分枚举属性一直不能访问（编译肯定能通过，否则无法打成WAR包），程序抛出java.lang.NoSuchFieldError异常。 java.lang.NoSuchFieldError的出现情况我猜">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">一次看似诡异的maven依赖导致NoSuchFieldError异常</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">一次看似诡异的maven依赖导致NoSuchFieldError异常</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#一次看似诡异的maven依赖导致NoSuchFieldError异常"><span class="post-toc-number">1.</span> <span class="post-toc-text">一次看似诡异的maven依赖导致NoSuchFieldError异常</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#问题背景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java-lang-NoSuchFieldError的出现情况"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">java.lang.NoSuchFieldError的出现情况</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#真实出现的场景"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">真实出现的场景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#整体重新编译也解决不了的情况"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">整体重新编译也解决不了的情况</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#我的问题的困境"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">我的问题的困境</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#stackoverflow网友的启发"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">stackoverflow网友的启发</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#references"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">references</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/maven/一次看似诡异的maven依赖导致NoSuchFieldError异常" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">一次看似诡异的maven依赖导致NoSuchFieldError异常</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-27T08:33:40.000Z" itemprop="datePublished" class="post-time">
+  2016-10-27
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="一次看似诡异的maven依赖导致NoSuchFieldError异常"><a href="#一次看似诡异的maven依赖导致NoSuchFieldError异常" class="headerlink" title="一次看似诡异的maven依赖导致NoSuchFieldError异常"></a>一次看似诡异的maven依赖导致NoSuchFieldError异常</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>在使用maven多项目构建的web project打成war包，部署到tomcat后，发现有一个Enum class，其中的部分枚举属性一直不能访问（编译肯定能通过，否则无法打成WAR包），程序抛出java.lang.NoSuchFieldError异常。</p>
+<h2 id="java-lang-NoSuchFieldError的出现情况"><a href="#java-lang-NoSuchFieldError的出现情况" class="headerlink" title="java.lang.NoSuchFieldError的出现情况"></a>java.lang.NoSuchFieldError的出现情况</h2><p>我猜测很多人对这个异常是很熟悉的，java.lang.NoSuchFieldError意味着试图访问一个类、接口、枚举不存在的属性。</p>
+<p>那么问题来了，为什么这样的“编译错误”没有在编译期被检测出来，而在运行期被当做一个异常抛出呢。</p>
+<p>我们试图来还原一下最微型的犯罪现场：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		System.out.println(A.a);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当我们javac编译java运行之后，一切正常。</p>
+<p>现在我们删除A中的static int a，然后重新编译A。</p>
+<p>很明显，B是不可能知道A发生了变化的，于是执行B的时候，会抛出java.lang.NoSuchFieldError异常。</p>
+<p>本质上，java.lang.NoSuchFieldError通常反映的是class文件版本的不匹配，B和一个不与自己版本匹配的A一起协作，所以发生了异常。</p>
+<h2 id="真实出现的场景"><a href="#真实出现的场景" class="headerlink" title="真实出现的场景"></a>真实出现的场景</h2><p>但真实开发场景下，我们有各种各样的构建工具（我这里的maven）和集成开发环境（比如我的intellij idea），一个project是肯定会被当做一个整体进行编译与打包的，实际上不可能出现上文所说的情况。</p>
+<p>所以，通常情况下，这个异常主要是在我们使用第三方类库的时候出现，最典型的就是当我们不用maven管理的情况下，引入纷繁复杂的spring jar包时，这个鲜艳的红字会在控制台显示100次。很容易理解，这就是因为jar包作为已经编译完成的class文件的打包版本，是无法得知与之协作jar包的情况的，他们也不可能作为一个整体进行构建与打包。于是ClassLoader只能无奈地抛出这个异常。</p>
+<p>类似的还有ClassNotFoundException, NoSuchMethodError等</p>
+<h2 id="整体重新编译也解决不了的情况"><a href="#整体重新编译也解决不了的情况" class="headerlink" title="整体重新编译也解决不了的情况"></a>整体重新编译也解决不了的情况</h2><p>即使你将整个项目作为整体重新编译，也有一种情况是解决不了的：</p>
+<p>那就是这个class被放在了extension libraries或bootstrap libraries。由于ClassLoader的双亲委托模型，jvm会优先加载启动类加载器和扩展类加载器对应目录的class，所以应用类加载器的class根本没有机会被加载，那么无论如何重编译都不可能解决问题。</p>
+<h2 id="我的问题的困境"><a href="#我的问题的困境" class="headerlink" title="我的问题的困境"></a>我的问题的困境</h2><p>根据上面的理论，我依次检查了我的tomcat webapp目录下的lib目录中的的jar包，我甚至将其解压、反编译以确定是否出现了编译上的问题。</p>
+<p>接着我检查了我的启动类加载目录与扩展类加载器目录中的jar包，很明显，这种情况下，不可能作死把我的class或者jar包放在这里。</p>
+<h2 id="stackoverflow网友的启发"><a href="#stackoverflow网友的启发" class="headerlink" title="stackoverflow网友的启发"></a>stackoverflow网友的启发</h2><p>stackoverflow.com上的网友提示，很有可能是在应用中有多份全限类名完全一致的class。</p>
+<p>于是我在抛出异常的语句之前，加了一句log，打印这个class的getResource(“”)结果。结果出人意料，这个class的资源位置并不是我想象的位置。</p>
+<p>还记得吗，我在开头就说明了，我是运用一个maven多项目构建的web project。</p>
+<p>在我的开发过程中，我曾经创建过一个module，姑且称之为base-module-old，其中包含了这个报错的类。<br>我将其打包、安装、部署之后，我重构了这个模块，将其变成了base-module-new。<br>但是base-module-old由于名字与base-module-new不一致，所以其文件永远留在了我的本地maven repository中。<br>同时，我的众多子module中，有一个module的依赖没有删除掉base-module-old，虽然这个base-module-old实际没有任何用处，但是每次maven打包都会将他复制到web的lib目录中，于是就出现了多个版本的同名class。<br>同时，由于这两个class其实都指向了相同的java源文件，于是IDE也没有发现任何问题，点击跳转时，十分顺利地会跳转到正确的java源代码，看上去一切OK。</p>
+<p>由于相当于代码依赖路径中有两条不同的路径去加载该class，所以这个问题也具有很强的隐蔽性。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里主要涉及到jvm classloader的相关知识，以及在一个classpath中出现了同样全限定名的class的经验。</p>
+<p>另外，多熟悉java api以及一定的反射知识，方便在运行时检验class对象的实际情况。</p>
+<h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p><a href="http://craftingjava.blogspot.jp/2012/08/javalangnosuchfielderror_9430.html" target="_blank" rel="noopener">Latte Blogger</a><br><a href="http://stackoverflow.com/questions/40275739/weird-java-lang-nosuchfielderror-in-webapp-of-tomcat-build-with-maven1" target="_blank" rel="noopener">stackoverflow上的提问</a></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/maven/一次看似诡异的maven依赖导致NoSuchFieldError异常/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/maven/一次看似诡异的maven依赖导致NoSuchFieldError异常/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/maven/">maven</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/jvm/深入理解jvm学习笔记/8虚拟机字节码执行引擎/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">虚拟机字节码执行引擎</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/jvm/深入理解jvm学习笔记/7虚拟机类加载机制/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">虚拟机类加载机制</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "一次看似诡异的maven依赖导致NoSuchFieldError异常",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/maven/一次看似诡异的maven依赖导致NoSuchFieldError异常/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

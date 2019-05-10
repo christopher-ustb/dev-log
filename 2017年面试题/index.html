@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>2017面试题记录 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,mysql,javascript">
+  <meta name="description" content="2017面试题记录2017-06-30 美团点评DB 数据库索引类型？  normal：普通索引。 unique：唯一索引，不允许重复。 full text：全文索引，长文章搜索。   数据库索引的数据结构？适用范围？  Hash索引：一次定位，效率高，但是由于经过了Hash运算，只能满足等值过滤，如”=”/“!=”/“IN”查询，无法范围查询，非排序索引，遇到大量hash值相等的情况时性能下降严">
+<meta name="keywords" content="java,mysql,javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2017面试题记录">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/2017年面试题/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="2017面试题记录2017-06-30 美团点评DB 数据库索引类型？  normal：普通索引。 unique：唯一索引，不允许重复。 full text：全文索引，长文章搜索。   数据库索引的数据结构？适用范围？  Hash索引：一次定位，效率高，但是由于经过了Hash运算，只能满足等值过滤，如”=”/“!=”/“IN”查询，无法范围查询，非排序索引，遇到大量hash值相等的情况时性能下降严">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2017面试题记录">
+<meta name="twitter:description" content="2017面试题记录2017-06-30 美团点评DB 数据库索引类型？  normal：普通索引。 unique：唯一索引，不允许重复。 full text：全文索引，长文章搜索。   数据库索引的数据结构？适用范围？  Hash索引：一次定位，效率高，但是由于经过了Hash运算，只能满足等值过滤，如”=”/“!=”/“IN”查询，无法范围查询，非排序索引，遇到大量hash值相等的情况时性能下降严">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">2017面试题记录</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">2017面试题记录</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2017面试题记录"><span class="post-toc-number">1.</span> <span class="post-toc-text">2017面试题记录</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2017-06-30-美团点评"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">2017-06-30 美团点评</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DB"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">DB</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Java"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">Java</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#前端"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">前端</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2017-07-05-哔哩哔哩"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2017-07-05 哔哩哔哩</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2017-07-11-爱奇艺"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">2017-07-11 爱奇艺</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2017-08-01-沪江网"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">2017-08-01 沪江网</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2017-08-09-蚂蚁金服"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">2017-08-09 蚂蚁金服</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-2017年面试题" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">2017面试题记录</h1>
+        <div class="post-meta">
+            <time datetime="2017-07-07T06:58:21.000Z" itemprop="datePublished" class="post-time">
+  2017-07-07
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/java/">java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="2017面试题记录"><a href="#2017面试题记录" class="headerlink" title="2017面试题记录"></a>2017面试题记录</h1><h2 id="2017-06-30-美团点评"><a href="#2017-06-30-美团点评" class="headerlink" title="2017-06-30 美团点评"></a>2017-06-30 美团点评</h2><h3 id="DB"><a href="#DB" class="headerlink" title="DB"></a>DB</h3><ol>
+<li><p>数据库索引类型？</p>
+<ul>
+<li>normal：普通索引。</li>
+<li>unique：唯一索引，不允许重复。</li>
+<li>full text：全文索引，长文章搜索。</li>
+</ul>
+</li>
+<li><p>数据库索引的数据结构？适用范围？</p>
+<ul>
+<li>Hash索引：一次定位，效率高，但是由于经过了Hash运算，只能满足等值过滤，如”=”/“!=”/“IN”查询，无法范围查询，非排序索引，遇到大量hash值相等的情况时性能下降严重（Hash碰撞问题）。</li>
+<li>B-Tree索引：从根节点到枝节点遍历（平衡树），搜索性能相对稳定，常用。可以适用于范围查询，可排序。</li>
+</ul>
+</li>
+<li><p>数据库事务四大特性？</p>
+<p> ACID：</p>
+<ul>
+<li>Atomic-原子性：整个数据库事务不可分割。</li>
+<li>Consistency-一致性：事务不能破坏关系数据的完整性以及业务逻辑的一致性。例如对银行转帐事务，不管事务成功还是失败，应该保证事务结束后ACCOUNTS表中Tom和Jack的存款总额为2000元。</li>
+<li>Isolation-隔离性：在并发环境中，当不同的事务同时操纵相同的数据时，每个事务都有各自的完整数据空间。由并发事务所做的修改必须与任何其他并发事务所做的修改隔离。事务查看数据更新时，数据所处的状态要么是另一事务修改它之前的状态，要么是另一事务修改它之后的状态，事务不会查看到中间状态的数据。</li>
+<li>Durability-持久性：只要事务成功结束，它对数据库所做的更新就必须永久保存下来。</li>
+</ul>
+</li>
+<li><p>什么是脏读、不可重复读、幻读？</p>
+<ol>
+<li><p>脏读: 一个事务正在访问数据，并且对数据进行了修改，而这种修改还没有提交到数据库中，这时，另外一个事务也访问这个数据，然后使用了这个数据。</p>
+<p> 1.Mary的原工资为1000, 财务人员将Mary的工资改为了8000(但未提交事务)</p>
+<p> 2.Mary读取自己的工资 ,发现自己的工资变为了8000，欢天喜地！</p>
+<p> 3.而财务发现操作有误，回滚了事务,Mary的工资又变为了1000像这样,Mary记取的工资数8000是一个脏数据。</p>
+</li>
+<li><p>不可重复读: 一个事务内，多次读同一数据。在这个事务还没有结束时，另外一个事务也访问该同一数据。那么，在第一个事务中的两次读数据之间，由于第二个事务的修改，那么第一个事务两次读到的的数据可能是不一样的。这样在一个事务内两次读到的数据是不一样的，因此称为是不可重复读。</p>
+<p> 1.在事务1中，Mary 读取了自己的工资为1000,操作并没有完成</p>
+<p> 2.在事务2中，这时财务人员修改了Mary的工资为2000,并提交了事务.</p>
+<p> 3.在事务1中，Mary 再次读取自己的工资时，工资变为了2000</p>
+<p>解决办法：如果只有在修改事务完全提交之后才可以读取数据，则可以避免该问题。</p>
+</li>
+<li><p>幻读: 当事务不是独立执行时发生的一种现象，例如第一个事务对一个表中的数据进行了修改，这种修改涉及到表中的全部数据行。同时，第二个事务也修改这个表中的数据，这种修改是向表中插入一行新数据。那么，以后就会发生操作第一个事务的用户发现表中还有没有修改的数据行，就好象发生了幻觉一样。</p>
+<p>目前工资为1000的员工有10人。</p>
+<p> 1.事务1,读取所有工资为1000的员工。</p>
+<p> 2.这时事务2向employee表插入了一条员工记录，工资也为1000</p>
+<p> 3.事务1再次读取所有工资为1000的员工 共读取到了11条记录</p>
+<p> 解决办法：如果在操作事务完成数据处理之前，任何其他事务都不可以添加新数据，则可避免该问题</p>
+<ul>
+<li>不可重复读的重点是修改: 同样的条件, 你读取过的数据,再次读取出来发现值不一样了</li>
+<li>幻读的重点在于新增或者删除: 同样的条件, 第 1 次和第 2 次读出来的记录数不一样 </li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>数据库事务隔离级别？解决什么问题？</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>读未提交</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>读已提交</td>
+<td>N</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>串行化</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><p>ReadUncommitted：<br>假设A事务即不发布共享锁，也不接受独占锁，那么并发的B或者其它事务可以改写A事务读取的数据，那么并发的C事务读取到的数据的状态和A的或者B的数据都可能不一致，那么。脏读、不可重复读、幻象数据都可能存在。</p>
+</li>
+<li><p>ReadCommitted：<br>假设A事务对正在读取数据Data放置了共享锁，那么Data不能被其它事务改写，所以当B事务对Data进行读取时总和A读取的Data数据是一致的，所以避免了脏读。由于在A没有提交之前可以对Data进行改写，那么B读取到的某个值可能会在其读取后被A更改从而导致了该值不能被重复取得；或者当B再次用相同的where字句时得到了和前一次不一样数据的结果集，也就是幻像数据。</p>
+</li>
+<li><p>RepeatableRead：<br>（注意MSDN原文中的第一句话：在查询中使用的所有数据上放置锁，所以不存在脏读的情况）。<br>假设A事务对读取的所有数据Data放置了锁，以阻止其它事务对Data的更改，在A没有提交之前，新的并发事务读取到的数据如果存在于Data中，那么该数据的状态和A事务中的数据是一致的，从而避免了不可重复的读取。但在A事务没有结束之前，B事务可以插入新记录到Data所在的表中，那么其它事务再次用相同的where字句查询时，得到的结果数可能上一次的不一致，也就是幻像数据。</p>
+</li>
+<li><p>Serializable：<br>在数据表上放置了排他锁，以防止在事务完成之前由其他用户更新行或向数据集中插入行，这是最严格的锁。它防止了脏读、不可重复读取和幻象数据。</p>
+</li>
+</ol>
+<p><a href="http://uule.iteye.com/blog/1109647" target="_blank" rel="noopener">http://uule.iteye.com/blog/1109647</a></p>
+<p><a href="https://tech.meituan.com/innodb-lock.html" target="_blank" rel="noopener">https://tech.meituan.com/innodb-lock.html</a></p>
+<h3 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h3><p>jvm这一块比较熟悉，不做详细记录了。</p>
+<ol>
+<li><p>jvm类加载器？</p>
+<p> 双亲委托模型：具有优先级的层次关系。</p>
+<p> 启动类加载器&lt;–扩展类加载器&lt;–应用程序类加载器&lt;–自定义类加载器</p>
+</li>
+<li><p>jvm gc新生代、老年代？</p>
+<p> 新生代:老年代=1:2</p>
+<p> Eden:Survivor=8:1:1</p>
+</li>
+<li><p>jvm gc实现方式？</p>
+<p> 新生代：复制<br> 老年代：标记-清除</p>
+</li>
+<li><p>struts2/spring mvc实现原理？</p>
+</li>
+</ol>
+<h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><ol>
+<li>javascript闭包？  </li>
+</ol>
+<h2 id="2017-07-05-哔哩哔哩"><a href="#2017-07-05-哔哩哔哩" class="headerlink" title="2017-07-05 哔哩哔哩"></a>2017-07-05 哔哩哔哩</h2><ol>
+<li><p>ConcurrentHashMap实现原理？</p>
+<p> 分离锁+不可变+volatile</p>
+<p> 将整个Map分隔为一组Segment，Segment结构与HashMap相似，其中是链表形式的HashBucket。</p>
+<p> Segment个数：concurrencyLevel，并发级别，默认为16。</p>
+<p> put操作时，针对单个Segment加锁而不是整个ConcurrentHashMap。</p>
+<p> get操作时，由于HashEntry不可变，其中value被定义为volatile，所以无需加锁。</p>
+<p> 所以理论上，ConcurrentHashMap可以支持Segment数目个线程并发写，任意数量线程并发读。</p>
+<p> <a href="http://wiki.jikexueyuan.com/project/java-collection/concurrenthashmap.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/java-collection/concurrenthashmap.html</a></p>
+</li>
+<li><p>java内存堆、栈？什么命令打印java内存快照？</p>
+</li>
+<li><p>tomcat调优？</p>
+<ol>
+<li><p>jvm层面</p>
+<ul>
+<li>server模式</li>
+<li>Xms-Xmx设为一致</li>
+<li>-XX:+UseParNewGC使用并行gc</li>
+<li>-XX:+UseConcMarkSweepGC使用cms gc</li>
+</ul>
+</li>
+<li><p>tomcat容器层面</p>
+<ul>
+<li>线程池个数设置</li>
+<li>gzip压缩</li>
+<li>超时时间</li>
+<li>禁用DNS查询</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>分布式设计CAP理论？</p>
+<p> Consistence一致性/Availability可用性/Partitioning分区容错性，最多只能满足2项。</p>
+</li>
+</ol>
+<h2 id="2017-07-11-爱奇艺"><a href="#2017-07-11-爱奇艺" class="headerlink" title="2017-07-11 爱奇艺"></a>2017-07-11 爱奇艺</h2><ol>
+<li><p>HashMap原理？</p>
+<p> 单纯数组：寻址快速，但插入、删除性能差；存储区域连续，占用内存严重。</p>
+<p> 单纯链表：寻址困难，但插入、删除性能差。</p>
+<p> HashMap的底层主要是基于数组和链表来实现的，综合二者特性。它之所以有相当快的查询速度主要是因为它是通过计算散列码来决定存储的位置。</p>
+<p> 关键方法：</p>
+<p> <code>final int hash(Object k)</code> 保证hash结果均匀分布</p>
+<p> <code>static int indexFor(int h, int length)</code> 利用位运算取低位（相当于取模），快速定位数组下标</p>
+<p> <a href="http://blog.csdn.net/jianyuerensheng/article/details/51579091" target="_blank" rel="noopener">http://blog.csdn.net/jianyuerensheng/article/details/51579091</a></p>
+</li>
+<li><p>i++是否线程安全？java.atomic包？</p>
+<p> java.atomic.AtomicInteger#getAndIncrement()</p>
+</li>
+<li><p>java锁？可重入锁？</p>
+</li>
+</ol>
+<h2 id="2017-08-01-沪江网"><a href="#2017-08-01-沪江网" class="headerlink" title="2017-08-01 沪江网"></a>2017-08-01 沪江网</h2><ol>
+<li><p>为什么说HashMap是线程不安全的？</p>
+<p> HashMap底层存储是一个Entry数组，Entry是一个链表，来解决hash碰撞。所以有以下线程问题：</p>
+<ol>
+<li>put()/remove()<br> 多线程调用put()/remove()方法并发生hash碰撞时，操作了同一个Entry链表，put()是将value加入表头，remove()是查找链表中节点删除，在put/remove方法未同步的情况下，会出现部分线程操作丢失的情况。</li>
+<li>resize()<br> 多线程同时触发扩容条件resize()时，各个线程将各自生成新的Entry数组并且rehash后，将其赋给底层table，那么可能出现只有一个线程的新数组成功赋给table，其他操作丢失的情况。</li>
+</ol>
+</li>
+<li><p>ConcurrentHashMap.size()如何实现？</p>
+<p> 前提：segment中有一个变量modCount来记录修改segment的次数，虽然这个实际值会超过int值的上线，但也起到了短时间内的参考作用。</p>
+<p> 循环执行：</p>
+<ol>
+<li>先在不加锁的情况下尝试累加各个segment.modCount与segment.count</li>
+<li>如果modCount的总和与上次循环相等，那么则认为此时map没有被修改，可以直接返回count的总和</li>
+<li>如果modCount的总和与上次循环不相等，那么则认为map被修改了，需要重新循环来计算size</li>
+<li>如果循环次数超过了RETRIES_BEFORE_LOCK变量，默认为2，那么将对所有segment加锁，再累加count</li>
+<li>释放所有的segment锁，返回size</li>
+</ol>
+</li>
+<li><p>DCL双检查锁单例模式为什么线程不安全？</p>
+</li>
+<li><p>atomic CAS？</p>
+</li>
+<li><p>static class能否包含非static方法？</p>
+</li>
+</ol>
+<h2 id="2017-08-09-蚂蚁金服"><a href="#2017-08-09-蚂蚁金服" class="headerlink" title="2017-08-09 蚂蚁金服"></a>2017-08-09 蚂蚁金服</h2><ol>
+<li><p>hibernate对比mybatis？</p>
+<ul>
+<li>hibernate是ORM，着重POJO和数据库表之间的映射；mybatis是SQL mapping，着重POJO与SQL映射。</li>
+<li>hibernate上手难度大，能自动建模、自动生成SQL，快速开发；mybatis对高级查询更加灵活。</li>
+<li>hibernate自动生成SQL，代码与数据库无关，理论上可移植性强于手动编写SQL的mybatis。</li>
+<li>hibernate查询全部字段，mybatis可以指定查询字段，性能稍好。</li>
+<li>mybatis直接面对sql，利于性能调优。</li>
+</ul>
+</li>
+<li><p>第三方支付回调防丢失？</p>
+</li>
+</ol>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/2017年面试题/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/2017年面试题/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/mysql/">mysql</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">线程安全性</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/design/请停止误用http-patch/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">请停止误用http-patch</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "2017面试题记录",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/2017年面试题/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>用户标签数据结构设计 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="数据结构设计">
+  <meta name="description" content="一次关于基于标签的查询与维护的数据结构设计探索需求背景对Author打标签（Tag），两者完全多对多映射：即一个author对应多个tag，一个tag也能被多个author所使用。 此数据结构设计需考虑一下操作的效率（实际耗时短）与便捷（使用hibernate ORM编码逻辑简单）。  给author增加tag 给author移除tag 查询所有的author关联的tag集合 查询某条author">
+<meta name="keywords" content="数据结构设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用户标签数据结构设计">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/design/用户标签数据结构设计/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="一次关于基于标签的查询与维护的数据结构设计探索需求背景对Author打标签（Tag），两者完全多对多映射：即一个author对应多个tag，一个tag也能被多个author所使用。 此数据结构设计需考虑一下操作的效率（实际耗时短）与便捷（使用hibernate ORM编码逻辑简单）。  给author增加tag 给author移除tag 查询所有的author关联的tag集合 查询某条author">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.849Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用户标签数据结构设计">
+<meta name="twitter:description" content="一次关于基于标签的查询与维护的数据结构设计探索需求背景对Author打标签（Tag），两者完全多对多映射：即一个author对应多个tag，一个tag也能被多个author所使用。 此数据结构设计需考虑一下操作的效率（实际耗时短）与便捷（使用hibernate ORM编码逻辑简单）。  给author增加tag 给author移除tag 查询所有的author关联的tag集合 查询某条author">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">用户标签数据结构设计</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">用户标签数据结构设计</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#一次关于基于标签的查询与维护的数据结构设计探索"><span class="post-toc-number">1.</span> <span class="post-toc-text">一次关于基于标签的查询与维护的数据结构设计探索</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#需求背景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">需求背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#雏形"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">雏形</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#基本行为对比"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">基本行为对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实际开发小坑"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">实际开发小坑</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#确定方案"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">确定方案</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-design/用户标签数据结构设计" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">用户标签数据结构设计</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-02T15:16:24.000Z" itemprop="datePublished" class="post-time">
+  2016-10-02
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="一次关于基于标签的查询与维护的数据结构设计探索"><a href="#一次关于基于标签的查询与维护的数据结构设计探索" class="headerlink" title="一次关于基于标签的查询与维护的数据结构设计探索"></a>一次关于基于标签的查询与维护的数据结构设计探索</h1><h2 id="需求背景"><a href="#需求背景" class="headerlink" title="需求背景"></a>需求背景</h2><p>对Author打标签（Tag），两者完全多对多映射：即一个author对应多个tag，一个tag也能被多个author所使用。</p>
+<p>此数据结构设计需考虑一下操作的效率（实际耗时短）与便捷（使用hibernate ORM编码逻辑简单）。</p>
+<ul>
+<li>给author增加tag</li>
+<li>给author移除tag</li>
+<li>查询所有的author关联的tag集合</li>
+<li>查询某条author的所有tag集合</li>
+<li>根据一条或多条tag查询同时带有这些标签的author集合</li>
+</ul>
+<h2 id="雏形"><a href="#雏形" class="headerlink" title="雏形"></a>雏形</h2><ol>
+<li>引入一个中间表Author_Tag，使用外键关联实现关系型数据库经典的ManyToMany关系</li>
+<li>在author中保存用连接符（如逗号或空格）连接的tag名字长字符串</li>
+<li>在author中保存用连接符连接的tag主键长字符串</li>
+</ol>
+<h2 id="基本行为对比"><a href="#基本行为对比" class="headerlink" title="基本行为对比"></a>基本行为对比</h2><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>增tag</th>
+<th>删tag</th>
+<th>查所有tag</th>
+<th>author查tags</th>
+<th>tag查authors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>经典多对多</td>
+<td>增加中间表</td>
+<td>删除中间表</td>
+<td>OK</td>
+<td>中间表与tag表</td>
+<td>查中间表与author表</td>
+</tr>
+<tr>
+<td>保存tag名</td>
+<td>直接修改author字段</td>
+<td>直接修改author字段</td>
+<td>OK</td>
+<td>最快，只是普通的字段</td>
+<td>很慢，全表like字段，并且索引基本无效果：中文，a+b的索引不等于b+a</td>
+</tr>
+<tr>
+<td>保存tag.id</td>
+<td>直接修改author字段</td>
+<td>直接修改author字段</td>
+<td>OK</td>
+<td>将id.split后逐一查询tag表</td>
+<td>较慢，内容都是数字，但仍然会由于顺序不同造成索引效果不佳</td>
+</tr>
+</tbody>
+</table>
+<p>对比可见：</p>
+<ol>
+<li>中间表多对多的方案在ORM的帮助下，编码最为方便，但需要查询多张表</li>
+<li>保存tag名方案的最大优势在于又author查询tag是单表查询，但是浪费空间，并且反向查询效率极差</li>
+<li>保存tag.id方案相对中庸，反向查询效率较高</li>
+</ol>
+<h2 id="实际开发小坑"><a href="#实际开发小坑" class="headerlink" title="实际开发小坑"></a>实际开发小坑</h2><p>最开始选择的是方案1，增删改查都十分方便，但是当要求多个tag并列筛选author时，写了个特别坑爹的sql：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.*</span><br><span class="line"><span class="keyword">FROM</span> Author a </span><br><span class="line"><span class="keyword">JOIN</span> Author_Tag aut <span class="keyword">ON</span>(a.id=aut.author_id)</span><br><span class="line"><span class="keyword">WHERE</span> aut.tag_id=<span class="number">1</span></span><br><span class="line"><span class="keyword">OR</span> aut.tag_id=<span class="number">2</span></span><br><span class="line"><span class="keyword">OR</span> aut.tag_id=<span class="number">3</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> a.id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="keyword">COUNT</span>(<span class="keyword">DISTINCT</span> aut.tag_id)=<span class="number">3</span></span><br></pre></td></tr></table></figure></p>
+<p>字面理解的话，这个SQL十分符合人类（菜鸟）的思维:</p>
+<p>tag.id=1,2,3不是in，不是or，但也不是and，因为笛卡尔积中不可能有一条数据同时满足<code>tag.id=1 and tag.id=2 and tag.id=3</code></p>
+<p>于是将满足任一条件的结果查询出来，在数个数是否等于3，就可以判断是否同时满足。</p>
+<p>但是，千万忍住这样的诱惑，这样的聚合查询会大大拖慢SQL查询速度。</p>
+<p>stackoverflow中推荐这种SQL查询语句：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> aut1.author_id</span><br><span class="line"><span class="keyword">FROM</span> Author_Tag aut1 </span><br><span class="line"><span class="keyword">JOIN</span> Author_Tag aut2 <span class="keyword">ON</span>(aut1.author_id=aut2.author_id <span class="keyword">and</span> aut2.tag_id=<span class="number">2</span>)</span><br><span class="line"><span class="keyword">JOIN</span> Author_Tag aut3 <span class="keyword">ON</span>(aut1.author_id=aut3.author_id <span class="keyword">and</span> aut3.tag_id=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> aut1.tag_id=<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>这种想法也不难理解，自连接三次后将笛卡尔积三个条件全部满足的部分筛选出来，留下来的author_id就是三个tag都满足的author数据</p>
+<p>至于这个查询为什么比上面的聚合查询选个数 快20倍，具体的原因我也不是十分清楚，模糊得感觉到这是一个空间换时间的策略。</p>
+<p>有待后续深入学习数据库再来填这个坑。</p>
+<h2 id="确定方案"><a href="#确定方案" class="headerlink" title="确定方案"></a>确定方案</h2><p>由于考虑到由tag查询author应该很少使用（产品上比较隐蔽，也没有突出此功能），最终选择了方案2来追求author查tags的方便与快捷。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/design/用户标签数据结构设计/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/design/用户标签数据结构设计/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/数据结构设计/">数据结构设计</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/javascript/angularjs/由一个bug窥探angular双向绑定的秘密/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">由一个bug窥探angular双向绑定的秘密</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/design/点赞设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">点赞设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "用户标签数据结构设计",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/design/用户标签数据结构设计/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

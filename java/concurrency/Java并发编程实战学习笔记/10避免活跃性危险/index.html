@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>避免活跃性危险 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="避免活跃性危险死锁“哲学家进餐”问题描述了死锁：每个人都拥有其他人需要的资源，同时又等待其他人已经拥有的资源，并且每个人在获得所有需要的资源之前都不会放弃已经拥有的资源。 线程A持有锁L并想获得锁M的同时，线程B持有锁M并尝试获得锁L，那么这两个线程将永远地等待下去，这种情况就是最简单的死锁形式（或称为“抱死”Deadly Embrace）。 数据库设计中考虑了监测死锁以及从死锁中恢复。发生死锁时">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="避免活跃性危险">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="避免活跃性危险死锁“哲学家进餐”问题描述了死锁：每个人都拥有其他人需要的资源，同时又等待其他人已经拥有的资源，并且每个人在获得所有需要的资源之前都不会放弃已经拥有的资源。 线程A持有锁L并想获得锁M的同时，线程B持有锁M并尝试获得锁L，那么这两个线程将永远地等待下去，这种情况就是最简单的死锁形式（或称为“抱死”Deadly Embrace）。 数据库设计中考虑了监测死锁以及从死锁中恢复。发生死锁时">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.851Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="避免活跃性危险">
+<meta name="twitter:description" content="避免活跃性危险死锁“哲学家进餐”问题描述了死锁：每个人都拥有其他人需要的资源，同时又等待其他人已经拥有的资源，并且每个人在获得所有需要的资源之前都不会放弃已经拥有的资源。 线程A持有锁L并想获得锁M的同时，线程B持有锁M并尝试获得锁L，那么这两个线程将永远地等待下去，这种情况就是最简单的死锁形式（或称为“抱死”Deadly Embrace）。 数据库设计中考虑了监测死锁以及从死锁中恢复。发生死锁时">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">避免活跃性危险</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">避免活跃性危险</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#避免活跃性危险"><span class="post-toc-number">1.</span> <span class="post-toc-text">避免活跃性危险</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#死锁"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">死锁</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#锁顺序死锁"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">锁顺序死锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#动态的锁顺序死锁"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">动态的锁顺序死锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#在协作对象之间发生的死锁"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">在协作对象之间发生的死锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#开放调用"><span class="post-toc-number">1.1.4.</span> <span class="post-toc-text">开放调用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#资源死锁"><span class="post-toc-number">1.1.5.</span> <span class="post-toc-text">资源死锁</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#死锁的避免与诊断"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">死锁的避免与诊断</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持定时的锁"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">支持定时的锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#通过线程转储信息来分析死锁"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">通过线程转储信息来分析死锁</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他活跃性危险"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">其他活跃性危险</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#饥饿"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">饥饿</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#糟糕的响应性"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">糟糕的响应性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#活锁"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">活锁</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">避免活跃性危险</h1>
+        <div class="post-meta">
+            <time datetime="2017-08-14T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-15
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="避免活跃性危险"><a href="#避免活跃性危险" class="headerlink" title="避免活跃性危险"></a>避免活跃性危险</h1><h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>“哲学家进餐”问题描述了死锁：每个人都拥有其他人需要的资源，同时又等待其他人已经拥有的资源，并且每个人在获得所有需要的资源之前都不会放弃已经拥有的资源。</p>
+<p>线程A持有锁L并想获得锁M的同时，线程B持有锁M并尝试获得锁L，那么这两个线程将永远地等待下去，这种情况就是最简单的死锁形式（或称为“抱死”Deadly Embrace）。</p>
+<p>数据库设计中考虑了监测死锁以及从死锁中恢复。发生死锁时，根据事务权重判断，回滚权重低的事务，从而使其他事务继续进行。</p>
+<p>JVM在解决死锁问题时没有如此强大，当一组Java线程死锁时，这些线程永远不能用了。</p>
+<h3 id="锁顺序死锁"><a href="#锁顺序死锁" class="headerlink" title="锁顺序死锁"></a>锁顺序死锁</h3><p>LeftRightDeadLock发生死锁的原因在于，2个线程试图以不同的顺序来获得相同的锁。</p>
+<p><strong>如果所有线程以固定的顺序来获得锁，那么在程序中就不会出现顺序死锁问题。</strong></p>
+<h3 id="动态的锁顺序死锁"><a href="#动态的锁顺序死锁" class="headerlink" title="动态的锁顺序死锁"></a>动态的锁顺序死锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transferMoney</span><span class="params">(Account from, Account to, Amount amount)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span>(from) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span>(to) &#123;</span><br><span class="line">            from.debit(amount);</span><br><span class="line">            to.credit(amount);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果并发：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Thread A : transferMoney(a, b, 10);</span><br><span class="line">Thread B : transferMoney(b, a, 20);</span><br></pre></td></tr></table></figure>
+<p>那么就可能发生死锁。</p>
+<p>解决思路：</p>
+<p>对多个需要加锁对象进行对比排序，采用固定的顺序进行加锁。如书中建议使用<code>System.identityHashCode()</code>来获取一致性hash，当hash碰撞时，采用“加时赛”的方式，额外增加一个锁以保证每次只有一个线程以<strong>未知</strong>顺序获得锁，从而消除死锁可能性。如果加锁对象包含一个唯一的、不可变的且具备可比性的键值属性，如id，那么制定锁规则会更加容易。</p>
+<h3 id="在协作对象之间发生的死锁"><a href="#在协作对象之间发生的死锁" class="headerlink" title="在协作对象之间发生的死锁"></a>在协作对象之间发生的死锁</h3><p>如果在持有锁时调用某个外部方法，那么将出现活跃性问题。在这个外部方法中，可能会获取其他锁，这可能会产生死锁，或者阻塞时间过长，导致其他线程无法及时获得当前被持有的锁。</p>
+<h3 id="开放调用"><a href="#开放调用" class="headerlink" title="开放调用"></a>开放调用</h3><p>在调用某个方法时不需要持有锁，那么这种调用被称为开放调用（Open Call）。</p>
+<p>通过尽可能地使用开放调用，将易于找出那些需要获取多个锁的代码路径，因此也就容易确保采用一致的顺序来获得锁。</p>
+<h3 id="资源死锁"><a href="#资源死锁" class="headerlink" title="资源死锁"></a>资源死锁</h3><p>当多个线程相互持有彼此正在等待的资源，又不释放自己已持有的资源时，会发生资源死锁。</p>
+<p>如线程A持有数据库D1的连接，并等待与数据库D2的连接，而线程B持有数据库D2并等待D1的连接，就会发生资源死锁。</p>
+<p>另一个基于资源的死锁形式就是线程饥饿死锁。如：一个任务提交另一个任务，并等待被提交的任务在单线程Executor中执行完成，这种情况下，第一个任务将永远等待，其他任务将无法执行。如果某些任务需要等待其他任务的结果，那么这些任务往往是产生线程饥饿死锁的主要来源，有限线程、资源池与相互依赖的任务不能一起使用。</p>
+<h2 id="死锁的避免与诊断"><a href="#死锁的避免与诊断" class="headerlink" title="死锁的避免与诊断"></a>死锁的避免与诊断</h2><p>如果必须获得多个锁，那么在设计时必须考虑锁的顺序：尽量减少潜在的加锁交互数量，将获取锁时需要遵守的协议写入正式文档并始终遵循。</p>
+<h3 id="支持定时的锁"><a href="#支持定时的锁" class="headerlink" title="支持定时的锁"></a>支持定时的锁</h3><p>显式使用Lock类中的定时tryLock功能来代替内置锁机制：指定超时时限，在等待超时后返回一个失败信息。</p>
+<h3 id="通过线程转储信息来分析死锁"><a href="#通过线程转储信息来分析死锁" class="headerlink" title="通过线程转储信息来分析死锁"></a>通过线程转储信息来分析死锁</h3><p>线程转储包含各个运行中的线程的栈追踪信息，类似于发生异常时的栈追踪信息。线程转储还包含加锁信息，例如每个线程持有了哪些锁，在哪些栈桢中获得这些锁，以及被阻塞的线程正在等待哪个锁。</p>
+<h2 id="其他活跃性危险"><a href="#其他活跃性危险" class="headerlink" title="其他活跃性危险"></a>其他活跃性危险</h2><h3 id="饥饿"><a href="#饥饿" class="headerlink" title="饥饿"></a>饥饿</h3><p>当线程由于无法访问它所需要的资源而不能继续执行时，就发生了“饥饿”，引发饥饿最常见的资源就是CPU时钟周期。如果Java程序中对线程的优先级使用不当，或者在持有锁时执行一些无法结束的结构（如无限循环、无限等待某个资源），那么也可能导致饥饿。</p>
+<p>Thread API中定义的线程优先级只是作为线程调度的参考，其中10个优先级会被JVM根据需要映射到操作系统的调度优先级，这种映射是与特定平台相关联的。</p>
+<p>要避免使用线程优先级，因为这会增加平台依赖性，并可能导致活跃性问题。在大多数程序中，都可以使用默认线程优先级。</p>
+<h3 id="糟糕的响应性"><a href="#糟糕的响应性" class="headerlink" title="糟糕的响应性"></a>糟糕的响应性</h3><p>CPU密集型的后台任务可能对响应性造成影响，因为它们会与响应线程共同竞争CPU时钟周期，这时应该降低它们的线程优先级，提高前台的响应性。</p>
+<p>不良的锁管理也可能导致糟糕的响应性，如对一个大容器进行迭代并对每个元素进行计算密集的处理。</p>
+<h3 id="活锁"><a href="#活锁" class="headerlink" title="活锁"></a>活锁</h3><p>当多个相互协作的线程都对彼此进行响应，从而修改各自的状态，并使得任何一个线程都无法继续执行时，就发生了活锁。</p>
+<p>要解决这种活锁问题，需要在重试机制中引入随机性。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">性能与可伸缩性</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">线程池的使用</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "避免活跃性危险",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

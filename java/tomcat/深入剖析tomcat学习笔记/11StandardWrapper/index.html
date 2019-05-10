@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>StandardWrapper | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,读书笔记,tomcat">
+  <meta name="description" content="StandardWrapper方法调用序列对于每个引入的http请求，具体的方法调用过程如下：  连接器(Connector)创建request/response对象 连接器调用StandardContext实例的invoke()方法 StandardContext实例invoke()方法调用其管道实例的invoke()方法，StandardContext中pipeline的基础阀是Standar">
+<meta name="keywords" content="java,读书笔记,tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="StandardWrapper">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="StandardWrapper方法调用序列对于每个引入的http请求，具体的方法调用过程如下：  连接器(Connector)创建request/response对象 连接器调用StandardContext实例的invoke()方法 StandardContext实例invoke()方法调用其管道实例的invoke()方法，StandardContext中pipeline的基础阀是Standar">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.864Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="StandardWrapper">
+<meta name="twitter:description" content="StandardWrapper方法调用序列对于每个引入的http请求，具体的方法调用过程如下：  连接器(Connector)创建request/response对象 连接器调用StandardContext实例的invoke()方法 StandardContext实例invoke()方法调用其管道实例的invoke()方法，StandardContext中pipeline的基础阀是Standar">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">StandardWrapper</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">StandardWrapper</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#StandardWrapper"><span class="post-toc-number">1.</span> <span class="post-toc-text">StandardWrapper</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#方法调用序列"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">方法调用序列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SingleThreadModel"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">SingleThreadModel</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#StandardWrapper类"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">StandardWrapper类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#分配servlet实例"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">分配servlet实例</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#载入servlet类"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">载入servlet类</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#StandardWrapperFacade类"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">StandardWrapperFacade类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#StandardWrapperValve类"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">StandardWrapperValve类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#FilterDef类"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">FilterDef类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ApplicationFilterConfig类"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">ApplicationFilterConfig类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ApplicationFilterChain类"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">ApplicationFilterChain类</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">StandardWrapper</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-10T02:09:28.000Z" itemprop="datePublished" class="post-time">
+  2016-11-10
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="StandardWrapper"><a href="#StandardWrapper" class="headerlink" title="StandardWrapper"></a>StandardWrapper</h1><h2 id="方法调用序列"><a href="#方法调用序列" class="headerlink" title="方法调用序列"></a>方法调用序列</h2><p>对于每个引入的http请求，具体的方法调用过程如下：</p>
+<ol>
+<li>连接器(Connector)创建request/response对象</li>
+<li>连接器调用StandardContext实例的invoke()方法</li>
+<li>StandardContext实例invoke()方法调用其管道实例的invoke()方法，StandardContext中pipeline的基础阀是StandardContextValve</li>
+<li>StandardContextValve实例invoke()方法获取相应的Wrapper实例，调用Wrapper实例的invoke()方法</li>
+<li>StandardWrapper类是Wrapper接口的标准实现，StandardWrapper实例的invoke()会调用其管道对象的invoke()方法，StandardWrapper中pipeline的基础阀是StandardWrapperValve</li>
+<li>StandardWrapperValve实例的invoke()方法调用Wrapper实例的allocate()方法获取servlet实例</li>
+<li>allocate()方法调用load()方法载入相应servlet类，若已载入，则无需重复载入</li>
+<li>load()方法调用servlet实例的init()方法</li>
+<li>StandardWrapperValve调用servlet实例的service()方法</li>
+</ol>
+<p>这一块的源代码相当有意思，主要涉及到接口<code>Container</code>、<code>Pipeline</code>，这两个接口分别制定了作为容器与管道的标准。</p>
+<p>而在这两个接口与标准实现类之间，加入了一个基础抽象类<code>ContainerBase</code>，这个类的声明是<code>public abstract class ContainerBase implements Container, Lifecycle, Pipeline</code>，<br>这个抽象类提供了基本每一个Container实现类都需要的通用功能，最典型的就是其invoke()方法：委托一个protected的Pipeline实例的invoke()方法来完成Container的invoke()方法。</p>
+<p>而这个实现了Pipeline接口的StandardPipeline实例的invoke()方法，其内部是一个被抽象掉细节的阀invoke()调用链条。</p>
+<p>而StandardContext与StandardWrapper都继承自ContainerBase抽象类，并且在自己的构造器中设置Pipeline对象的基础阀，这个基础阀实现了容器最基础的功能。</p>
+<p>StandardContextValve是StandardContext的基础阀，除了禁止访问<code>META-INF</code>/<code>WEB-INF</code>这两个保留目录外，主要功能就是根据请求找到合适的Wrapper实例。而这个寻找的过程，其实就是后端路由的寻址，从面向对象角度来说，这个是不可能靠这个Valve来实现的，于是代码中也是找到关联的Context容器来寻址。</p>
+<p>类似的，StandardWrapperValve是StandardWrapper的基础阀，其主要的功能就是让servlet被调用，而具体的调用方法，仍然是交由与其关联的Wrapper容器。</p>
+<p>于是，一个精彩的<strong>责任链模式</strong>已经跃然纸上，容器-管道-阀三者之间实现了功能上的组合，但是代码逻辑上的松耦合。</p>
+<p>容器的标准实现将自己的核心功能作为基础阀，放在了自己的管道里，但是基础阀主要是对容器API功能的调用来实现要求，并没有将容器的功能搬到阀中。</p>
+<p>但是由于管道模型的出现，让开发者有机会在各个级别的容器中增加自己的阀来定制处理流程，而开发者只需要编写自己的阀代码加入管道即可。</p>
+<h2 id="SingleThreadModel"><a href="#SingleThreadModel" class="headerlink" title="SingleThreadModel"></a>SingleThreadModel</h2><p>SingleThreadModel接口是一个标记性接口，实现了SingleThreadModel的servlet被称为STM servlet类。</p>
+<p>根据Servlet规范，实现此接口的目的，是为了保证servlet实例一次只处理一个请求，即不会出现两个线程同时执行一个servlet实例的service()方法。</p>
+<p>其实该接口并不能防止servlet访问共享资源造成的同步问题，因为出现争用的不一定是servlet的实例变量，也有可能是其他类的静态变量或者servlet作用域之外的类，而后者这种情况不胜枚举。</p>
+<h2 id="StandardWrapper类"><a href="#StandardWrapper类" class="headerlink" title="StandardWrapper类"></a>StandardWrapper类</h2><p>StandardWrapper对象的主要任务，是载入所需的servlet类，并进行实例化，交由StandardWrapperValve调用servlet的service()方法。</p>
+<h3 id="分配servlet实例"><a href="#分配servlet实例" class="headerlink" title="分配servlet实例"></a>分配servlet实例</h3><p>Wrapper接口定义了allocate()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Servlet <span class="title">allocate</span><span class="params">()</span> <span class="keyword">throws</span> ServletException</span>;</span><br></pre></td></tr></table></figure></p>
+<p>要求分配一个准备好执行service()方法的已经初始化完成的servlet实例。<br>如果这个servlet类没有实现SingleThreadModel接口，那么立即返回已初始化的实例；<br>如果实现了SingleThreadModel接口，Wrapper实现类必须保证，直到调用deallocate()取消这个servlet实例的分配，才重新分配这个servlet实例。</p>
+<p>所以StandardWrapper类的allocate()方法主要分为两个部分，分别处理实现STM servlet与非STM servlet。</p>
+<p>对于非STM servlet类，或者初次加载servlet类还不知道是否是STM servlet，只是使用了一个<code>private Servlet instance</code>的变量来保存这个唯一的servlet实例。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                instance = loadServlet();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ServletException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ServletException</span><br><span class="line">                    (sm.getString(<span class="string">"standardWrapper.allocate"</span>), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在loadServlet()中会判断servlet是否STM。</p>
+<p>对于STM servlet类，StandardWrapper会试图从一个对象池中获取可用实例，这个对象池的类型：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Stack containing the STM instances.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> Stack instancePool = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure></p>
+<p>代码与所有的池设计类似，不再赘述。<br>与之相关的变量有：</p>
+<ul>
+<li><code>private int countAllocated = 0;</code> 当前活跃的分配个数</li>
+<li><code>private int nInstances = 0;</code> 当前已加载的实例个数</li>
+<li><code>private int maxInstances = 20;</code> 对象池最大容量</li>
+</ul>
+<h3 id="载入servlet类"><a href="#载入servlet类" class="headerlink" title="载入servlet类"></a>载入servlet类</h3><p>Wrapper接口声明了load()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">load</span><span class="params">()</span> <span class="keyword">throws</span> ServletException</span>;</span><br></pre></td></tr></table></figure></p>
+<p>要求加载和初始化一个servlet实例，即载入servlet类，并调用其init()方法。</p>
+<p>下面看一下StandardWrapper类loadServlet()方法是如何工作的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Nothing to do if we already have an instance or an instance pool</span></span><br><span class="line"><span class="keyword">if</span> (!singleThreadModel &amp;&amp; (instance != <span class="keyword">null</span>))</span><br><span class="line">    <span class="keyword">return</span> instance;</span><br></pre></td></tr></table></figure></p>
+<p>如果不是STM Servlet并且实例存在，则直接返回该实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((actualClass == <span class="keyword">null</span>) &amp;&amp; (jspFile != <span class="keyword">null</span>)) &#123;</span><br><span class="line">    Wrapper jspWrapper = (Wrapper)</span><br><span class="line">        ((Context) getParent()).findChild(Constants.JSP_SERVLET_NAME);</span><br><span class="line">    <span class="keyword">if</span> (jspWrapper != <span class="keyword">null</span>)</span><br><span class="line">        actualClass = jspWrapper.getServletClass();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果Servlet是一个JSP页面，那么获取jsp页面对应的实际Servlet类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Complain if no servlet class has been specified</span></span><br><span class="line"><span class="keyword">if</span> (actualClass == <span class="keyword">null</span>) &#123;</span><br><span class="line">    unavailable(<span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> ServletException</span><br><span class="line">        (sm.getString(<span class="string">"standardWrapper.notClass"</span>, getName()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果没有指定class名，抛出异常，终止后续操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Acquire an instance of the class loader to be used</span></span><br><span class="line">Loader loader = getLoader();</span><br><span class="line"><span class="keyword">if</span> (loader == <span class="keyword">null</span>) &#123;</span><br><span class="line">    unavailable(<span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> ServletException</span><br><span class="line">        (sm.getString(<span class="string">"standardWrapper.missingLoader"</span>, getName()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取载入器，如果找不到载入器，抛出异常。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Special case class loader for a container provided servlet</span></span><br><span class="line"><span class="keyword">if</span> (isContainerProvidedServlet(actualClass)) &#123;</span><br><span class="line">    classLoader = <span class="keyword">this</span>.getClass().getClassLoader();</span><br><span class="line">    log(sm.getString</span><br><span class="line">          (<span class="string">"standardWrapper.containerServlet"</span>, getName()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果servlet是Catalina提供的一些用于访问servlet容器内部数据的专用servlet类，那么将classLoader赋值为容器的ClassLoader实例。</p>
+<p>之后是用classloader载入servlet类-实例化-触发相关事件-调用servlet#init()-判断是否是STM servlet-初始化对象池的过程。</p>
+<h2 id="StandardWrapperFacade类"><a href="#StandardWrapperFacade类" class="headerlink" title="StandardWrapperFacade类"></a>StandardWrapperFacade类</h2><p>Servlet实例的init()方法需要传入javax.servlet.ServletConfig类型的参数，而StandardWrapper类本身其实是实现了ServletConfig接口的，所以理论上将StandardWrapper本身this传递给servlet就可以了。</p>
+<p>但还是老生常谈，这里运用了一个StandardWrapperFacade类作为外观类来隐藏掉StandardWrapper的方法。</p>
+<h2 id="StandardWrapperValve类"><a href="#StandardWrapperValve类" class="headerlink" title="StandardWrapperValve类"></a>StandardWrapperValve类</h2><p>StandardWrapperValve类是StandardWrapper实例中的基础阀，完成两个操作：</p>
+<ol>
+<li>执行与servlet相关的全部过滤器</li>
+<li>调用servlet的service()方法</li>
+</ol>
+<p>实际操作步骤如下：</p>
+<ol>
+<li>调用StandardWrapper实例allocate()获取servlet实例</li>
+<li>调用私有方法createFilterChain()创建过滤器链</li>
+<li>调用ApplicationFilterChain#doFilter()执行过滤以及调用service()方法</li>
+<li>释放过滤器链</li>
+<li>调用Wrapper实例的deallocate()方法取消分配</li>
+<li>若该servlet不再被使用到，则调用Wrapper#unload()方法</li>
+</ol>
+<h2 id="FilterDef类"><a href="#FilterDef类" class="headerlink" title="FilterDef类"></a>FilterDef类</h2><p>FilterDef表示一个过滤器的定义，正如在部署描述器(web.xml)中定义的\<filter\>节点那样。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">FilterDef</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 实现这个过滤器的java class全限定名</span></span><br><span class="line">    <span class="keyword">private</span> String filterClass = <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">// 过滤器名称，在特定的web应用中必须是唯一的</span></span><br><span class="line">    <span class="keyword">private</span> String filterName = <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">// 过滤器的初始化参数集合</span></span><br><span class="line">    <span class="keyword">private</span> Map parameters = <span class="keyword">new</span> HashMap();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></filter\></p>
+<h2 id="ApplicationFilterConfig类"><a href="#ApplicationFilterConfig类" class="headerlink" title="ApplicationFilterConfig类"></a>ApplicationFilterConfig类</h2><p>ApplicationFilterConfig类实现javax.servlet.FilterConfig接口，用于管理Web应用第一次启动时创建的过滤器实例。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ApplicationFilterConfig</span><span class="params">(Context context, FilterDef filterDef)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> ClassCastException, ClassNotFoundException,</span></span><br><span class="line"><span class="function">           IllegalAccessException, InstantiationException,</span></span><br><span class="line"><span class="function">           ServletException </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>();</span><br><span class="line">    <span class="keyword">this</span>.context = context;</span><br><span class="line">    setFilterDef(filterDef);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它的构造函数，接受一个Context对象表示一个Web应用程序，FilterDef表示一个过滤器定义。<br>ApplicationFilterConfig#getFilter()方法会返回一个javax.servlet.Filter对象，<br>如果未实例化，则在此方法中定位classloader-加载类-实例化对象-调用Filter#init()方法。</p>
+<h2 id="ApplicationFilterChain类"><a href="#ApplicationFilterChain类" class="headerlink" title="ApplicationFilterChain类"></a>ApplicationFilterChain类</h2><p>ApplicationFilterChain类实现javax.servlet.FilterChain接口。<br>StandardWrapperValve#invoke()方法会创建ApplicationFilterChain实例，并调用其doFilter()方法。<br>而ApplicationFilterChain#doFilter()的实现中，会调用第一个过滤器Filter#doFilter(ServletRequest, ServletResponse, FilterChain)，并将自身作为第三个参数传入Filter实例，以达到链式调用的目的。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/12StandardContext/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">StandardContext</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/9Session管理/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Session管理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "StandardWrapper",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

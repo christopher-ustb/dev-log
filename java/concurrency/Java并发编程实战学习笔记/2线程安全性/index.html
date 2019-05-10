@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>线程安全性 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="线程安全性Java中主要的同步机制：  synchronized关键字 volatile类型变量 显式锁 原子变量  面向对象的程序状态的封装性越好，访问某个变量的代码越少，就越容易确保对变量的所有访问实现正确同步，同时也更容易找出变量在哪些条件下被访问，也就越容易实现线程安全性。 什么是线程安全性正确性：某个类的行为与其规范完全一致。 线程安全性：当多个线程访问某个类时，不管运行时环境运用何种调">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程安全性">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="线程安全性Java中主要的同步机制：  synchronized关键字 volatile类型变量 显式锁 原子变量  面向对象的程序状态的封装性越好，访问某个变量的代码越少，就越容易确保对变量的所有访问实现正确同步，同时也更容易找出变量在哪些条件下被访问，也就越容易实现线程安全性。 什么是线程安全性正确性：某个类的行为与其规范完全一致。 线程安全性：当多个线程访问某个类时，不管运行时环境运用何种调">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.853Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程安全性">
+<meta name="twitter:description" content="线程安全性Java中主要的同步机制：  synchronized关键字 volatile类型变量 显式锁 原子变量  面向对象的程序状态的封装性越好，访问某个变量的代码越少，就越容易确保对变量的所有访问实现正确同步，同时也更容易找出变量在哪些条件下被访问，也就越容易实现线程安全性。 什么是线程安全性正确性：某个类的行为与其规范完全一致。 线程安全性：当多个线程访问某个类时，不管运行时环境运用何种调">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">线程安全性</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">线程安全性</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#线程安全性"><span class="post-toc-number">1.</span> <span class="post-toc-text">线程安全性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#什么是线程安全性"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">什么是线程安全性</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#原子性"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">原子性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#竞态条件"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">竞态条件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#示例：延迟初始化中的竞态条件"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">示例：延迟初始化中的竞态条件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#复合操作"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">复合操作</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#加锁机制"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">加锁机制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#内置锁"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">内置锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#重入"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">重入</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#用锁来保护状态"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">用锁来保护状态</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#活跃性与性能"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">活跃性与性能</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/2线程安全性" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">线程安全性</h1>
+        <div class="post-meta">
+            <time datetime="2017-07-25T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-07-26
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h1><p>Java中主要的同步机制：</p>
+<ul>
+<li>synchronized关键字</li>
+<li>volatile类型变量</li>
+<li>显式锁</li>
+<li>原子变量</li>
+</ul>
+<p>面向对象的程序状态的封装性越好，访问某个变量的代码越少，就越容易确保对变量的所有访问实现正确同步，同时也更容易找出变量在哪些条件下被访问，也就越容易实现线程安全性。</p>
+<h2 id="什么是线程安全性"><a href="#什么是线程安全性" class="headerlink" title="什么是线程安全性"></a>什么是线程安全性</h2><p>正确性：某个类的行为与其规范完全一致。</p>
+<p>线程安全性：当多个线程访问某个类时，不管运行时环境运用何种调度方式，或者这些线程如何交替执行，并且在调用代码中不需要任何额外的同步或协同，这个类始终表现正确的行为，那么就称这个类是线程安全的。</p>
+<p>书中举了一个无状态Servlet的例子，表示无状态对象一定是线程安全的。</p>
+<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>在Servlet中增加一个实例变量，并且多线程调用i++的方式，说明非线程安全。</p>
+<h3 id="竞态条件"><a href="#竞态条件" class="headerlink" title="竞态条件"></a>竞态条件</h3><p>当某个计算的正确性取决于多个线程的交替执行时序时，就会发生竞态条件。</p>
+<p>常见的竞态条件类型就是“先检查后执行”操作，即通过一个可能失效的观测结果来决定下一步的动作：首先观察到某个条件为真（例如文件X不存在），然后根据这个结果采用相应的动作（创建文件X），但事实上，在你观察到结果以及开始创建文件之间，观察结果可能会失效（另一个线程在此期间创建了文件X），从而导致各种问题（某预期的异常、数据被覆盖、文件被破坏等）。</p>
+<h3 id="示例：延迟初始化中的竞态条件"><a href="#示例：延迟初始化中的竞态条件" class="headerlink" title="示例：延迟初始化中的竞态条件"></a>示例：延迟初始化中的竞态条件</h3><p>线程不安全的懒汉单例模式。</p>
+<h3 id="复合操作"><a href="#复合操作" class="headerlink" title="复合操作"></a>复合操作</h3><p>我们将“先检查后执行”、“读取-修改-写入”等称为复合操作：包含了一组必须以原子方式执行的操作以确保线程安全性。</p>
+<p>书中采用了现有的线程安全类java.util.concurrent.atomic.AtomicLong原子变量，来实现在数值和对象引用上的原子状态转换（<code>AtomicLong#incrementAndGet()</code>）。</p>
+<h2 id="加锁机制"><a href="#加锁机制" class="headerlink" title="加锁机制"></a>加锁机制</h2><p>如何想在Servlet中添加更多的状态，是否只需要增加更多的线程安全状态变量（如AtomicReference）就可以了？</p>
+<p>要保持状态的一致性，就需要在单个原子操作中更新所有相关的状态变量。</p>
+<h3 id="内置锁"><a href="#内置锁" class="headerlink" title="内置锁"></a>内置锁</h3><p>synchronized修饰的方法的锁就是方法调用所在的对象，static synchronized方法以Class对象为锁。</p>
+<p>Java内置锁（也成为监视器锁Monitor Lock），相当于一种互斥锁，最多只有一个线程能持有。</p>
+<h3 id="重入"><a href="#重入" class="headerlink" title="重入"></a>重入</h3><p>内置锁是可重入的，如果某个线程试图获取一个已经由自己持有的锁，那么这个请求可以成功。</p>
+<p><strong>可重入意味着获取锁的粒度是线程，而不是调用。</strong></p>
+<p>重入的一种实现方式是，为每个锁关联一个所有者线程与获取计数器，计数器为0表示未被任何锁持有；重入时，计数器递增。</p>
+<p>重入提升了加锁行为的封装性，简化了面向对象并发代码的开发。</p>
+<p>同一对象内，一个synchronized方法调用另外一个synchronized不会出现死锁。</p>
+<h2 id="用锁来保护状态"><a href="#用锁来保护状态" class="headerlink" title="用锁来保护状态"></a>用锁来保护状态</h2><p>你需要自行构造加锁协议或者同步策略来实现对共享状态的安全访问，并且在程序中自始至终使用它。</p>
+<p>一种常见的加锁约定：将所有可变状态都封装在对象内部，并通过对象的内置锁对所有访问可变状态的代码路径同步，使得在该对象上不会出现并发访问。常见的线程安全集合类如Vector、HashTable都使用了这种模式。</p>
+<p>当类的不变性条件涉及到多个状态变量时，那么还有另外一个需求：在不变性条件中的每个变量都必须有同一个锁来保护。</p>
+<p>另外，如果只是将每个方法加上synchronized，并不能保证符合操作都是原子的，如Vector：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (vector.contains(element)) &#123;</span><br><span class="line">    vector.add(element);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="活跃性与性能"><a href="#活跃性与性能" class="headerlink" title="活跃性与性能"></a>活跃性与性能</h2><p>将Servlet#service()方法声明为synchronized虽然可以同步，每次只有一个线程可以执行，但这背离了Servlet框架的初衷。这种程序称之为不良并发（Poor Concurrency）：可同时调用的数量，不仅受到可用处理资源的限制，还受到程序本身结构的限制。</p>
+<p>需要缩小同步代码块范围。</p>
+<p>使用synchronized后不再使用Atomic变量，不推荐使用多种不同的同步机制。</p>
+<p>使用锁时，如果持有锁时间过长（如执行时间很长的计算、网络IO等无法快速完成的操作），那么会带来活跃性或性能问题。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/3对象的共享/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">对象的共享</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/2017年面试题/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">2017面试题记录</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "线程安全性",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>java垃圾回收与内存分配策略 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,读书笔记,jvm">
+  <meta name="description" content="java垃圾回收与内存分配策略判断对象是否存活 引用计数算法  无法解决循环引用问题：  1234567ReferenceCountingGC objA = new ReferenceCountingGC();ReferenceCountingGC objB = new ReferenceCountingGC();objA.instance = objB;objB.instance = objA;">
+<meta name="keywords" content="java,读书笔记,jvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java垃圾回收与内存分配策略">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="java垃圾回收与内存分配策略判断对象是否存活 引用计数算法  无法解决循环引用问题：  1234567ReferenceCountingGC objA = new ReferenceCountingGC();ReferenceCountingGC objB = new ReferenceCountingGC();objA.instance = objB;objB.instance = objA;">
+<meta property="og:image" content="https://christopher-ustb.github.io/dev-log/images/java/Collectors.jpg">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.856Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java垃圾回收与内存分配策略">
+<meta name="twitter:description" content="java垃圾回收与内存分配策略判断对象是否存活 引用计数算法  无法解决循环引用问题：  1234567ReferenceCountingGC objA = new ReferenceCountingGC();ReferenceCountingGC objB = new ReferenceCountingGC();objA.instance = objB;objB.instance = objA;">
+<meta name="twitter:image" content="https://christopher-ustb.github.io/dev-log/images/java/Collectors.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java垃圾回收与内存分配策略</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">java垃圾回收与内存分配策略</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#java垃圾回收与内存分配策略"><span class="post-toc-number">1.</span> <span class="post-toc-text">java垃圾回收与内存分配策略</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#判断对象是否存活"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">判断对象是否存活</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#垃圾收集算法"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">垃圾收集算法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java堆分代简述（主要来自Google）"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">java堆分代简述（主要来自Google）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HotSpot算法实现"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">HotSpot算法实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#垃圾收集器"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">垃圾收集器</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存分配策略"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">内存分配策略</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java垃圾回收与内存分配策略</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-16T01:56:24.000Z" itemprop="datePublished" class="post-time">
+  2016-10-16
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="java垃圾回收与内存分配策略"><a href="#java垃圾回收与内存分配策略" class="headerlink" title="java垃圾回收与内存分配策略"></a>java垃圾回收与内存分配策略</h1><h2 id="判断对象是否存活"><a href="#判断对象是否存活" class="headerlink" title="判断对象是否存活"></a>判断对象是否存活</h2><ol>
+<li><p>引用计数算法</p>
+<p> 无法解决循环引用问题：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ReferenceCountingGC objA = new ReferenceCountingGC();</span><br><span class="line">ReferenceCountingGC objB = new ReferenceCountingGC();</span><br><span class="line">objA.instance = objB;</span><br><span class="line">objB.instance = objA;</span><br><span class="line">objA = null;</span><br><span class="line">objB = null;</span><br><span class="line">System.gc();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可达性分析算法(Reachability Analysis)</p>
+<p> 以GC Roots对象作为起始点，树形搜索引用链(Reference Chain)，不可达对象为不可用对象。</p>
+<p> GC Roots：</p>
+<ul>
+<li>虚拟机栈中的本地变量表中的引用对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中引用对象</li>
+</ul>
+</li>
+<li>引用类型扩充<ul>
+<li>强引用(Strong Reference): 不会被GC</li>
+<li>软引用(SoftReference): 在内存溢出溢出发生之前会被二次回收</li>
+<li>弱引用(WeakReference): 下一次gc肯定会被回收</li>
+<li>虚引用(PhantomReference): 专门用来发出一个被GC的系统通知</li>
+</ul>
+</li>
+<li>finalize()<ul>
+<li>一个对象只被执行一次</li>
+<li>如果此方法中将this关联到一个强引用，那么可以避免被GC</li>
+<li>从不会使用这个方法</li>
+</ul>
+</li>
+<li>回收方法区<ul>
+<li>回收废弃常量</li>
+<li>回收类<ul>
+<li>该类的所有实例都已被回收，java堆中没有该类的任何实例</li>
+<li>该类的ClassLoader已被回收</li>
+<li>该类的java.lang.Class对象没有被引用，无法再任何地方运用反射来访问该类的方法</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><ol>
+<li>标记-清除算法<ul>
+<li>简单直接</li>
+<li>效率不高</li>
+<li>产生大量的内存碎片</li>
+</ul>
+</li>
+<li>复制算法<ul>
+<li>将内存分块，每次gc时将存活对象复制到另一块，一次清理已使用块。</li>
+<li>适合回收新生代，IBM研究表明98%的对象都是朝生夕死</li>
+</ul>
+</li>
+<li>标记-整理算法<ul>
+<li>让存活对象向内存的一端移动，直接清除掉边界以外的内存</li>
+<li>避免了复制算法必须浪费一定空间或者需要额外空间做分配担保的缺点</li>
+<li>适合老年代</li>
+</ul>
+</li>
+</ol>
+<h2 id="java堆分代简述（主要来自Google）"><a href="#java堆分代简述（主要来自Google）" class="headerlink" title="java堆分代简述（主要来自Google）"></a>java堆分代简述（主要来自Google）</h2><p>分代思想中，将内存对象分为新生代和老年代，以使用不同的gc机制。</p>
+<p>新生代/老年代 大小默认比例为1/2(jvm参数为–XX:NewRatio)</p>
+<p>新生代又被分为Eden、From Survivor、To Survivor，默认比例为8:1:1</p>
+<p>这两个单词神级命名，伊甸园与幸存者，传神了。</p>
+<p>在不考虑内存不够的情形下：</p>
+<ul>
+<li>新创建的对象实例会保存在Eden区</li>
+<li>在经历第一次gc后，没被回收的幸存者会进入Survivor区，并对age计数为1岁</li>
+<li>每次gc都会给Survivor中的对象加一岁</li>
+<li>当age达到指定岁数后，默认15，该对象会进入老年代</li>
+</ul>
+<p>在Survivor不足时，需要依赖其他内存区域（老年代）进行分配担保(Handle Promotion)</p>
+<h2 id="HotSpot算法实现"><a href="#HotSpot算法实现" class="headerlink" title="HotSpot算法实现"></a>HotSpot算法实现</h2><ol>
+<li><p>枚举根节点</p>
+<p> 由于Stop The World事情，如果每次从GC Roots节点遍历庞大的引用链，那么必然会消耗很多时间，所以必须优化gc roots的检查速度。</p>
+<p> 在HotSpot虚拟机中，使用了一组称为OopMap的数据结构，在类加载完成时，HotSpot将对象内什么偏移量上是什么类型的数据计算出来，一遍gc扫描时，直接可以通过查找这个map快速得到引用信息。</p>
+</li>
+</ol>
+<ol>
+<li><p>安全点(SafePoint)</p>
+<p> 安全点是为了解决一个问题：如果为每一条指令生成OopMap，那么需要消耗大量的额外空间，GC的空间成本将会很高。</p>
+<p> 其实HotSpot记录了一些特定位置，称为<strong>安全点</strong>，程序执行时并非在所有地方都可能停下来GC，只有在到达安全点时才暂停。</p>
+<p> SafePoint通常是在指令序列复用的地方产生，如方法调用、循环跳转、异常跳转等。</p>
+<p> GC中断进程的方案主要有2种：</p>
+<ul>
+<li><p>抢先式中断(Preemptive Suspension)</p>
+</li>
+<li><p>主动式中断(Voluntary Suspension)</p>
+<p>  GC需要中断线程时，不直接对线程操作，之为他设置一个标志，线程执行时主动轮询这个标志，发现为真时主动中断挂起。</p>
+</li>
+</ul>
+</li>
+<li><p>安全区域(Safe Region)</p>
+<p> Safe Region是为了解决SafePoint设计的一个问题：如果程序没有占用CPU时间，如线程处于Sleep或者Blocked状态，这时线程不可能响应JVM的中断请求。</p>
+<p> Safe Region: 在一段代码片段中，引用关系不会发生变化，在此区域的GC都是安全的。Safe Region是对SafePoint的一种扩展。</p>
+</li>
+</ol>
+<h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2><p><img src="/dev-log/images/java/Collectors.jpg" alt="Collectors"></p>
+<ol>
+<li><p>Serial收集器</p>
+<ul>
+<li>新生代收集器</li>
+<li>单线程收集器</li>
+<li>由于其简单直接，是Client模式下的默认收集器</li>
+</ul>
+</li>
+<li><p>ParNew收集器</p>
+<ul>
+<li>新生代收集器</li>
+<li>Serial的并行多线程版本</li>
+<li>Server模式下的默认收集器</li>
+</ul>
+</li>
+<li><p>Parallel Scavenge收集器</p>
+<p> 目标是为了追求可控制的吞吐量，所以Parallel Scavenge收集器又称为“吞吐量优先”收集器</p>
+<p> 吞吐量(Throughput)：CPU用于运行用户代码与CPU总耗时的比值，吞吐量=运行用户代码时间/(运行用户代码时间+垃圾收集时间)</p>
+<p> 提供了GC自适应的调节策略(GC Ergonomics)：虚拟机会根据当前系统运行情况收集性能监控信息，动态调整参数：</p>
+<ul>
+<li>新生代大小-Xms</li>
+<li>Eden与Survivor区比例-XX:SurvivorRatio</li>
+<li><p>晋升老年代对象的大小-XX:PretenureSizeThreshold</p>
+<p>以提供最合适的停顿时间或最大吞吐量。</p>
+</li>
+</ul>
+</li>
+<li><p>Serial Old收集器</p>
+<p> Serial收集器的老年代版本</p>
+</li>
+<li><p>Parallel Old收集器</p>
+<p> Parallel Scavenge收集器的老年代版本</p>
+</li>
+<li><p>CMS收集器</p>
+<p> CMS(Concurrent Mark Sweep)收集器是一种以获取最短回收停顿时间为目标的收集器。</p>
+<p> 基于“标记-清除”算法，步骤：</p>
+<ul>
+<li>初始标记(CMS initial mark)</li>
+<li>并发标记(CMS concurrent mark)</li>
+<li>重新标记(CMS remark)</li>
+<li>并发清除(CMS concurrent sweep)</li>
+</ul>
+</li>
+<li><p>G1收集器(Garbage-First)</p>
+<ul>
+<li>并行与并发</li>
+<li>分代收集</li>
+<li>空间整合</li>
+<li><p>可预测的停顿</p>
+<p>核心思路–“化整为零”：将java堆划分为多个大小相等的独立区域（Region），保留新生代与老年代的概念，但不再是物理隔离，它们都是一部分Region的集合。</p>
+<p>如何解决跨Region（分代回收中可达性分析必须扫描老年代的引用关系，因为有可能老年代引用指向了新生代对象）之间的对象引用关系问题：</p>
+<p>G1中每个Region都有一个Remembered Set。虚拟机发现程序对Reference类型数据进行写操作时，会产生一个Write Barrier暂时中断写操作，检查Reference是否与之处于不同的Region。如果是，则通过CardTable将相关引用信息记录到被引用对象所属的Region的Remembered Set中。这样就无需全堆扫描地进行GC Roots枚举。</p>
+<p>回收步骤：</p>
+</li>
+<li>初始标记(Initial Marking)</li>
+<li>并发标记(Concurrent Marking)</li>
+<li>最终标记(Final Marking)</li>
+<li>筛选回收(Live Data Counting and Evacuation)</li>
+</ul>
+</li>
+</ol>
+<h2 id="内存分配策略"><a href="#内存分配策略" class="headerlink" title="内存分配策略"></a>内存分配策略</h2><ol>
+<li><p>对象优先在Eden区分配</p>
+<p> 对象在新生代Eden区分配。如果Eden区没有足够空间，则发起一次Minor GC。</p>
+<hr>
+<p> Minor GC： 新生代GC，Java对象大多朝生夕死，所以minor gc十分频繁，回收速度也较快。</p>
+<p> Major GC/Full GC： 老年代GC，速度慢。</p>
+<hr>
+</li>
+<li><p>大对象直接进入老年代</p>
+<p> 大对象：需要大量连续内存空间的对象，典型的就是长字符串以及数组。</p>
+<p> 还有种更坏的对象，叫做“朝生夕灭”的“短命大对象”，写程序时应当避免。</p>
+<p> /<em>*<br> 注释，看不见(误)<br> 这个在犁书项目计算字符串在排版中的实际位置时总是出现，在方法本地栈区分配超大的字符串数组，然而这个对象会随着方法的执行完毕快速变成垃圾，替jvm抱怨一句：宝宝心里苦。
+ </em>/</p>
+</li>
+<li><p>长期存活的对象将进入老年代</p>
+<p> -XX:MaxTenuringThreshold设置对象晋升老年代的年龄阈值，默认15</p>
+</li>
+<li><p>动态对象年龄判定</p>
+<p> 如果Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，那么年龄大于或等于该年龄的对象将直接进入老年代，无需等到MaxTenuringThreshold中要求的年龄。</p>
+</li>
+<li><p>空间分配担保</p>
+<p> 发生Minor GC之前，jvm会检查老年代最大可用的连续空间是否大于新生代所有对象总和：</p>
+<ul>
+<li><p>如果大于，那么Minor GC肯定是安全的，因为老年代提供了充分的晋升空间。</p>
+</li>
+<li><p>如果小于，那么jvm会查看HandlePromotionFailure的值是否允许冒险担保失败：</p>
+<ul>
+<li><p>如果允许，那么会检查老年代最大可用的连续空间是否大于以往晋升到老年代对象的平均大小：</p>
+<ul>
+<li>如果大于，尝试进行Minor GC</li>
+<li>如果小于，Full GC</li>
+</ul>
+</li>
+<li><p>如果不允许担保失败，改为Full GC</p>
+</li>
+</ul>
+<p>这里有两个精彩的比喻：</p>
+</li>
+<li><p>担保</p>
+<p>  Minor GC采用了复制手机算法后，如果Survivor空间的轮换备份不足以容纳新生代对象时，必须委托老年代空间为其担保</p>
+</li>
+<li><p>冒险</p>
+<p>  与生活中的贷款相似，如果老年代提供担保，那么老年代本身必须有容纳这些对象的剩余空间（手头有足够的空闲现金）。而这个风险，就是老年代的剩余空间大于以往的平均晋升大小，但是这一次的担保空间不足，只能进行一次Full GC来腾出更多空间。</p>
+<p>虽然担保失败时绕的圈子是很大的，但大部分情况，还是会允许冒险，避免Full GC过于频繁，而这基于了一个对动态概率取平均值大多数情况下有效的信心。</p>
+</li>
+</ul>
+</li>
+</ol>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/jvm/">jvm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/javascript/angularjs/angular-mvc解构web-im/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">angular-mvc解构web-im</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/design/订单合并支付数据表设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">订单合并支付数据表设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "java垃圾回收与内存分配策略",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/3垃圾收集器与内存分配策略/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

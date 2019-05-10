@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>对象的共享 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="对象的共享上一章《线程安全性》介绍了如何通过同步来避免多个线程同时访问相同的数据，本章将介绍如何共享和发布对象，从而使之能够安全地有多个线程访问。 可见性当多个线程在没有同步机制的情况下共享数据，可能出现读线程不能按照预期地读取到写线程对共享数据的修改。 重排序：在没有同步的情况下，编译期、处理器以及运行时等，都可能对操作的顺序进行一些意想不到的调整。在缺乏足够同步的多线程程序中，想要对内存操作的">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对象的共享">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/3对象的共享/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="对象的共享上一章《线程安全性》介绍了如何通过同步来避免多个线程同时访问相同的数据，本章将介绍如何共享和发布对象，从而使之能够安全地有多个线程访问。 可见性当多个线程在没有同步机制的情况下共享数据，可能出现读线程不能按照预期地读取到写线程对共享数据的修改。 重排序：在没有同步的情况下，编译期、处理器以及运行时等，都可能对操作的顺序进行一些意想不到的调整。在缺乏足够同步的多线程程序中，想要对内存操作的">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.853Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对象的共享">
+<meta name="twitter:description" content="对象的共享上一章《线程安全性》介绍了如何通过同步来避免多个线程同时访问相同的数据，本章将介绍如何共享和发布对象，从而使之能够安全地有多个线程访问。 可见性当多个线程在没有同步机制的情况下共享数据，可能出现读线程不能按照预期地读取到写线程对共享数据的修改。 重排序：在没有同步的情况下，编译期、处理器以及运行时等，都可能对操作的顺序进行一些意想不到的调整。在缺乏足够同步的多线程程序中，想要对内存操作的">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">对象的共享</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">对象的共享</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#对象的共享"><span class="post-toc-number">1.</span> <span class="post-toc-text">对象的共享</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#可见性"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">可见性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#失效数据"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">失效数据</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#非原子的64位操作"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">非原子的64位操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#加锁与可见性"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">加锁与可见性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#volatile变量"><span class="post-toc-number">1.1.4.</span> <span class="post-toc-text">volatile变量</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#发布与逸出"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">发布与逸出</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#线程封闭"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">线程封闭</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#栈封闭"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">栈封闭</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ThreadLocal类"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">ThreadLocal类</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#不变性"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">不变性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#final域"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">final域</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#安全发布"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">安全发布</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#不正确的发布：正确的对象被破坏"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">不正确的发布：正确的对象被破坏</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#不可变对象与初始化安全性"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">不可变对象与初始化安全性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全发布的常用模式"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text">安全发布的常用模式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#事实不可变对象"><span class="post-toc-number">1.5.4.</span> <span class="post-toc-text">事实不可变对象</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#可变对象"><span class="post-toc-number">1.5.5.</span> <span class="post-toc-text">可变对象</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">总结</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/3对象的共享" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">对象的共享</h1>
+        <div class="post-meta">
+            <time datetime="2017-07-26T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-07-27
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="对象的共享"><a href="#对象的共享" class="headerlink" title="对象的共享"></a>对象的共享</h1><p>上一章《线程安全性》介绍了如何通过同步来避免多个线程同时访问相同的数据，本章将介绍如何共享和发布对象，从而使之能够安全地有多个线程访问。</p>
+<h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>当多个线程在没有同步机制的情况下共享数据，可能出现读线程不能按照预期地读取到写线程对共享数据的修改。</p>
+<p>重排序：在没有同步的情况下，编译期、处理器以及运行时等，都可能对操作的顺序进行一些意想不到的调整。在缺乏足够同步的多线程程序中，想要对内存操作的执行顺序进行判断，几乎无法得出正确的结论。</p>
+<h3 id="失效数据"><a href="#失效数据" class="headerlink" title="失效数据"></a>失效数据</h3><p>除非在每次访问变量时都使用同步，否则很有可能获得该变量的一个失效值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ThreadSafe</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedInteger</span> </span>&#123;</span><br><span class="line">    <span class="meta">@GuardedBy</span>(<span class="string">"this"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> value;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;<span class="keyword">this</span>.value = value;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="非原子的64位操作"><a href="#非原子的64位操作" class="headerlink" title="非原子的64位操作"></a>非原子的64位操作</h3><p>当线程在没有同步的情况读取变量，可能得到一个失效值，但至少这个值至少是之前某个线程设置的值，而不是一个随机值：这种安全性保证也被称为最低安全性。</p>
+<p>但是非volatile的64位数值（double/long）可能无法保证最低安全性，可能读取到某个值的高32位和另一个值的低32位。</p>
+<h3 id="加锁与可见性"><a href="#加锁与可见性" class="headerlink" title="加锁与可见性"></a>加锁与可见性</h3><p>加锁的含义不仅局限于互斥性，还包含可见性。为了确保所有线程都能看到共享变量的最新值，所有读写操作的线程都必须在同一个锁上同步。</p>
+<h3 id="volatile变量"><a href="#volatile变量" class="headerlink" title="volatile变量"></a>volatile变量</h3><p>volatile变量上的操作不会与其他内存操作一起重排序。volatile变量不会被缓存在寄存器或者对其他处理器不可见的地方，因此读取volatile变量总是会返回最新值。</p>
+<p>访问volatile变量不会加锁，不会使线程堵塞，是一种比synchronized更轻量级的同步机制。</p>
+<p>仅当volatile能简化代码的实现以及对同步策略的验证时，才应该使用。如果在验证正确性时，需要对可见性进行复杂的判断，那么就不要使用volatile。</p>
+<p>典型用法：检查某个状态标识以判断是否退出循环。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">boolean</span> asleep;</span><br><span class="line">...</span><br><span class="line">    <span class="keyword">while</span> (!asleep) &#123;</span><br><span class="line">        countSheep();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>volatile不能保证i++的原子性，除非你确保只有一个线程对变量执行写操作。</p>
+<p>使用volatile必须满足以下所有条件：</p>
+<ul>
+<li>对变量的写入操作不依赖变量的当前值，或者能确定只有单个线程更新变量。</li>
+<li>该变量不与其他变量一起纳入不变性条件。</li>
+<li>不需要加锁。</li>
+</ul>
+<h2 id="发布与逸出"><a href="#发布与逸出" class="headerlink" title="发布与逸出"></a>发布与逸出</h2><p>发布（Publish）：使对象在当前作用域之外的代码使用。如：</p>
+<ul>
+<li>将一个指向该对象的引用保存到其他代码能访问的地方</li>
+<li>在一个非私有方法中返回该引用</li>
+<li>将引用传递到其他类的方法中</li>
+</ul>
+<p>逸出（Escape）：某个不应该发布的对象被发布。</p>
+<p>当某个对象逸出后，你必须假设某个类或线程会误用该对象。这正是使用封装的主要原因：封装使得对程序的正确性分析变得可能，并使无意中破坏设计约束条件变得很难。</p>
+<h2 id="线程封闭"><a href="#线程封闭" class="headerlink" title="线程封闭"></a>线程封闭</h2><p>一种避免使用同步的方式就是不共享数据，如果仅在单线程内访问，就不需要同步，这种技术被称为“线程封闭”。</p>
+<h3 id="栈封闭"><a href="#栈封闭" class="headerlink" title="栈封闭"></a>栈封闭</h3><p>只通过局部变量访问对象。</p>
+<h3 id="ThreadLocal类"><a href="#ThreadLocal类" class="headerlink" title="ThreadLocal类"></a>ThreadLocal类</h3><p>ThreadLocal通常用于防止对可变的单实例变量或全局变量共享。</p>
+<h2 id="不变性"><a href="#不变性" class="headerlink" title="不变性"></a>不变性</h2><p>不可变对象一定是线程安全的。</p>
+<p>当满足以下条件时，对象才是不可变的：</p>
+<ul>
+<li>对象创建以后其状态不能修改</li>
+<li>所有域都是final</li>
+<li>对象是正确创建的（创建期间this引用没有逸出）</li>
+</ul>
+<p>保存在不可变对象中的状态仍然可以更新，即通过一个保存新状态的实例来替换原有的不可变对象。</p>
+<h3 id="final域"><a href="#final域" class="headerlink" title="final域"></a>final域</h3><p>除非需要某个域是可变的，否则将其声明为final域，是很好的编程习惯。</p>
+<h2 id="安全发布"><a href="#安全发布" class="headerlink" title="安全发布"></a>安全发布</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Holder holder;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    holder = <span class="keyword">new</span> Holder();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种不正确的发布导致其他线程看到尚未构建完成的对象。</p>
+<h3 id="不正确的发布：正确的对象被破坏"><a href="#不正确的发布：正确的对象被破坏" class="headerlink" title="不正确的发布：正确的对象被破坏"></a>不正确的发布：正确的对象被破坏</h3><p>你不能指望一个尚未被完全创建的对象拥有完整性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Holder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> n;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Holder</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123; <span class="keyword">this</span>.n = n; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">assertSanity</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (n != n) &#123;</span><br><span class="line">            <span class="comment">// 可能抛出异常</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"this statement is false."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="不可变对象与初始化安全性"><a href="#不可变对象与初始化安全性" class="headerlink" title="不可变对象与初始化安全性"></a>不可变对象与初始化安全性</h3><p><strong>任何线程都可以在不需要额外同步的情况下安全地访问不可变对象，即使在发布这些对象时没有使用同步。</strong></p>
+<h3 id="安全发布的常用模式"><a href="#安全发布的常用模式" class="headerlink" title="安全发布的常用模式"></a>安全发布的常用模式</h3><p>要安全地发布一个对象，对象的引用以及对象的状态必须同时对其他线程可见。一个正确构造的对象可以通过以下方式来安全地发布：</p>
+<ul>
+<li><p>在静态初始化函数中初始化一个对象引用。   </p>
+<pre><code class="java"><span class="keyword">public</span> <span class="keyword">static</span> Holder holder = <span class="keyword">new</span> Holder();
+</code></pre>
+<p>  静态初始化器在jvm类的初始化阶段执行，由于jvm内部存在同步机制，这种对象可以安全发布。</p>
+</li>
+<li><p>将对象的引用保存到volatile的域或者AtomicReference对象中。</p>
+</li>
+<li>将对象的引用保存到某个正确构造对象的final域中。</li>
+<li>将对象的引用保存到一个由锁保护的域中。<ul>
+<li>将键或值放入HashTable、synchronizedMap、ConcurrentMap中</li>
+<li>将元素放入Vector、CopyOnWriteArrayList、CopyOnWriteArraySet、synchronizedList、synchronizedSet中</li>
+<li>放入BlockingQueue、ConcurrentLinkedQueue中</li>
+</ul>
+</li>
+</ul>
+<h3 id="事实不可变对象"><a href="#事实不可变对象" class="headerlink" title="事实不可变对象"></a>事实不可变对象</h3><p>与上面定义的技术不可变对象一样，任何线程都可以在不需要额外同步的情况下安全地访问事实不可变对象。</p>
+<h3 id="可变对象"><a href="#可变对象" class="headerlink" title="可变对象"></a>可变对象</h3><p>要安全地共享可变对象，这些对象必须安全发布，并且必须是线程安全的，或者由某个锁保护起来。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在并发程序中使用共享变量，可以使用如下策略：</p>
+<ul>
+<li><strong>线程封闭</strong>。</li>
+<li><strong>只读共享</strong>。 包括不可变对象和事实不可变对象</li>
+<li><strong>线程安全共享</strong>。 线程安全的对象在其内部实现同步，因此多个线程可以通过对象的公有接口来访问而不需要进一步的同步。</li>
+<li><strong>保护对象</strong>。 被保护的对象只能通过持有特定的锁来访问。包括封装在其他线程安全对象中的对象，以及已发布的并且由某个特定锁保护的对象。</li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/3对象的共享/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/3对象的共享/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/4对象的组合/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">对象的组合</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/2线程安全性/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">线程安全性</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "对象的共享",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/3对象的共享/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

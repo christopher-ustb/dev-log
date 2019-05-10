@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>乐书开发者代码规范 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="lebooks-private,代码规范">
+  <meta name="description" content="乐书开发者代码规范乐书网络内部开发分享，非相关人员忽略 说明此文档作为lebooks开发者的一个编程风格的规范，不仅仅讨论结构是否正确、代码格式是否美观的问题，同时也作为一些约定与标准，以保证代码风格的一致与协调。 与其他任何代码风格指南一样，此文档不可避免地有一些带有个人或团队风格的、不地道的、不被部分人认可的规定与要求，可以共同讨论以及逐步修订。 通用 url中使用连字符   如：http:/">
+<meta name="keywords" content="lebooks-private,代码规范">
+<meta property="og:type" content="article">
+<meta property="og:title" content="乐书开发者代码规范">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/lebooks/乐书开发者代码规范/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="乐书开发者代码规范乐书网络内部开发分享，非相关人员忽略 说明此文档作为lebooks开发者的一个编程风格的规范，不仅仅讨论结构是否正确、代码格式是否美观的问题，同时也作为一些约定与标准，以保证代码风格的一致与协调。 与其他任何代码风格指南一样，此文档不可避免地有一些带有个人或团队风格的、不地道的、不被部分人认可的规定与要求，可以共同讨论以及逐步修订。 通用 url中使用连字符   如：http:/">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.874Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="乐书开发者代码规范">
+<meta name="twitter:description" content="乐书开发者代码规范乐书网络内部开发分享，非相关人员忽略 说明此文档作为lebooks开发者的一个编程风格的规范，不仅仅讨论结构是否正确、代码格式是否美观的问题，同时也作为一些约定与标准，以保证代码风格的一致与协调。 与其他任何代码风格指南一样，此文档不可避免地有一些带有个人或团队风格的、不地道的、不被部分人认可的规定与要求，可以共同讨论以及逐步修订。 通用 url中使用连字符   如：http:/">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">乐书开发者代码规范</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">乐书开发者代码规范</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#乐书开发者代码规范"><span class="post-toc-number">1.</span> <span class="post-toc-text">乐书开发者代码规范</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#说明"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">说明</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#通用"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">通用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#java后端"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">java后端</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前端"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">前端</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考文献"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">参考文献</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-lebooks/乐书开发者代码规范" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">乐书开发者代码规范</h1>
+        <div class="post-meta">
+            <time datetime="2016-12-28T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2016-12-29
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="乐书开发者代码规范"><a href="#乐书开发者代码规范" class="headerlink" title="乐书开发者代码规范"></a>乐书开发者代码规范</h1><p><strong>乐书网络内部开发分享，非相关人员忽略</strong></p>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>此文档作为lebooks开发者的一个编程风格的规范，不仅仅讨论结构是否正确、代码格式是否美观的问题，同时也作为一些约定与标准，以保证代码风格的一致与协调。</p>
+<p>与其他任何代码风格指南一样，此文档不可避免地有一些带有个人或团队风格的、不地道的、不被部分人认可的规定与要求，可以共同讨论以及逐步修订。</p>
+<h2 id="通用"><a href="#通用" class="headerlink" title="通用"></a>通用</h2><ul>
+<li><p>url中使用连字符</p>
+<p>  如：<em><a href="http://www.lebooks.me/lishu/api/product-catalogs/1/products" target="_blank" rel="noopener">http://www.lebooks.me/lishu/api/product-catalogs/1/products</a></em>，<em><a href="http://www.lebooks.me/product-catalogs" target="_blank" rel="noopener">http://www.lebooks.me/product-catalogs</a></em><br>  在url（不管是api路径还是前端页面路由）中出现两个单词表达一个完整的意思的情况，都像这里一样采用连字符的方式，而不是下划线或者驼峰。<br>  因为连字符表示将2个词连接，而下划线表示分割，正确的语义利于SEO；不使用驼峰是为了防止某些大小写不敏感的情况。</p>
+</li>
+<li><p>禁止滥用任务注释TODO/FIXME</p>
+<p>  为保证使用任务注释，如<code>//TODO</code>，<code>//FIXME</code>的开发者不被干扰，没有使用任务注释习惯的开发者必须及时删除已被处理的TODO任务。<br>  尤其不能滥用eclipse自动补齐代码块产生的TODO注释。</p>
+</li>
+</ul>
+<h2 id="java后端"><a href="#java后端" class="headerlink" title="java后端"></a>java后端</h2><ul>
+<li><p>可能被其他大模块引用的maven module必须添加test case，建议所有具体实现的代码全部添加test case</p>
+</li>
+<li><p>如果自定义异常作为方法的一种返回情况，必须显示定义在接口层面让调用者感知</p>
+</li>
+<li><p>java模板类的职责划分</p>
+<ul>
+<li><p>BO (business object)</p>
+<p>  业务对象，通常作为service层的输入和输出模板，主要与业务层绑定，体现了业务逻辑的向外特性，不会因为视图层的变化而发生变化。</p>
+</li>
+<li><p>VO (view object)</p>
+<p>  视图对象，作为rest api返回response的模板，主要与显示层绑定，体现了api用户的需求。</p>
+<p>  通常VO是对BO的拓展、简化以及组合，在VO比较简单的情况下，可以直接略去使用BO类，但发生视图需求改变而不是业务改变时，严禁直接修改BO以及service逻辑。</p>
+</li>
+<li><p>RQBO (request body object)</p>
+<p>  请求体对象，主要作为POST方式的rest api请求体的模板，主要与http request的提交数据形式绑定，体现了api用户的需求。</p>
+<p>  通常request body中的数据还是交由service业务逻辑去处理，所以在比较简单的情况下，可以直接使用BO对象作为RQBO的模板使用，但是必须保证BO与业务逻辑的绑定关系，RQBO发生变化与BO不一致时，必须另外创建RQBO。</p>
+</li>
+<li><p>PO (persistence object)</p>
+<p>  持久化对象。</p>
+</li>
+<li><p>各种类型object之间的转化，可以借助一下映射工具，如Dozer。</p>
+</li>
+</ul>
+</li>
+<li><p>关于基本数据类型与包装数据类型的使用标准 </p>
+<ol>
+<li>所有的POJO类属性必须使用包装数据类型。 </li>
+<li>RPC方法的返回值和参数必须使用包装数据类型。 </li>
+<li><p>所有的局部变量【推荐】使用基本数据类型。 </p>
+<p>说明：</p>
+<p>POJO类属性没有初值是提醒使用者在需要使用时，必须自己显式地进行赋值，任何NPE问题，或者入库检查，都由使用者来保证。 </p>
+<p>数据库的查询结果可能是null，因为自动拆箱，用基本数据类型接收有NPE风险。 </p>
+<p>同样的，在将基本类型的默认值自动装箱的过程中，也可能造成逻辑上的错误，原本的控制变成了0值。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://www.hawstein.com/posts/google-java-style.html" target="_blank" rel="noopener">Google Java编程风格指南</a></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/lebooks/乐书开发者代码规范/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/lebooks/乐书开发者代码规范/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/lebooks-private/">lebooks-private</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/代码规范/">代码规范</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/spring/spring源代码学习笔记/1IOC容器之根接口BeanFactory/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">IOC容器之根接口BeanFactory</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/design/隐式依赖也是依赖/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">隐式依赖也是依赖</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "乐书开发者代码规范",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/lebooks/乐书开发者代码规范/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

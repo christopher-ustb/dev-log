@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>线程池的使用 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="线程池的使用在任务与执行策略之间的隐形耦合虽然Executor框架为制定和修改执行策略都提供了很大的灵活性，但并非所有的任务都适用所有的执行策略。有些类型的任务需要明确制定执行策略：  依赖性任务 使用线程封闭机制的任务：必须单线程 对响应时间敏感的任务 适用ThreadLocal的任务  线程饥饿死锁只要线程池中的任务需要无限期地等待一些必须由池中其他任务才能提供的资源或条件，例如某个任务等待另">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程池的使用">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="线程池的使用在任务与执行策略之间的隐形耦合虽然Executor框架为制定和修改执行策略都提供了很大的灵活性，但并非所有的任务都适用所有的执行策略。有些类型的任务需要明确制定执行策略：  依赖性任务 使用线程封闭机制的任务：必须单线程 对响应时间敏感的任务 适用ThreadLocal的任务  线程饥饿死锁只要线程池中的任务需要无限期地等待一些必须由池中其他任务才能提供的资源或条件，例如某个任务等待另">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.855Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程池的使用">
+<meta name="twitter:description" content="线程池的使用在任务与执行策略之间的隐形耦合虽然Executor框架为制定和修改执行策略都提供了很大的灵活性，但并非所有的任务都适用所有的执行策略。有些类型的任务需要明确制定执行策略：  依赖性任务 使用线程封闭机制的任务：必须单线程 对响应时间敏感的任务 适用ThreadLocal的任务  线程饥饿死锁只要线程池中的任务需要无限期地等待一些必须由池中其他任务才能提供的资源或条件，例如某个任务等待另">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">线程池的使用</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">线程池的使用</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#线程池的使用"><span class="post-toc-number">1.</span> <span class="post-toc-text">线程池的使用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#在任务与执行策略之间的隐形耦合"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">在任务与执行策略之间的隐形耦合</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#线程饥饿死锁"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">线程饥饿死锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#运行时间较长的任务"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">运行时间较长的任务</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#设置线程池的大小"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">设置线程池的大小</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#配置ThreadPoolExecutor"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">配置ThreadPoolExecutor</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#线程池的创建与销毁"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">线程池的创建与销毁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#管理队列任务"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">管理队列任务</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#饱和策略"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">饱和策略</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#线程工厂"><span class="post-toc-number">1.3.4.</span> <span class="post-toc-text">线程工厂</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#在调用构造函数后再定制ThreadPoolExecutor"><span class="post-toc-number">1.3.5.</span> <span class="post-toc-text">在调用构造函数后再定制ThreadPoolExecutor</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#扩展ThreadPoolExecutor"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">扩展ThreadPoolExecutor</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/8线程池的使用" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">线程池的使用</h1>
+        <div class="post-meta">
+            <time datetime="2017-08-09T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-10
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h1><h2 id="在任务与执行策略之间的隐形耦合"><a href="#在任务与执行策略之间的隐形耦合" class="headerlink" title="在任务与执行策略之间的隐形耦合"></a>在任务与执行策略之间的隐形耦合</h2><p>虽然Executor框架为制定和修改执行策略都提供了很大的灵活性，但并非所有的任务都适用所有的执行策略。有些类型的任务需要明确制定执行策略：</p>
+<ul>
+<li>依赖性任务</li>
+<li>使用线程封闭机制的任务：必须单线程</li>
+<li>对响应时间敏感的任务</li>
+<li>适用ThreadLocal的任务</li>
+</ul>
+<h3 id="线程饥饿死锁"><a href="#线程饥饿死锁" class="headerlink" title="线程饥饿死锁"></a>线程饥饿死锁</h3><p>只要线程池中的任务需要无限期地等待一些必须由池中其他任务才能提供的资源或条件，例如某个任务等待另一个任务的返回值或执行效果，那么除非线程池足够大，否则将发生线程饥饿死锁。</p>
+<h3 id="运行时间较长的任务"><a href="#运行时间较长的任务" class="headerlink" title="运行时间较长的任务"></a>运行时间较长的任务</h3><p>执行时间较长的任务不仅会造成线程阻塞，甚至会增加执行时间较短任务的服务时间。如果线程池中线程的数量远小于在稳定状态下执行时间较长任务的数量，那么到最后可能所有的线程都会运行这些执行时间较长的任务，从而影响整体的响应性。</p>
+<h2 id="设置线程池的大小"><a href="#设置线程池的大小" class="headerlink" title="设置线程池的大小"></a>设置线程池的大小</h2><p>对于计算密集型的任务，在拥有N个处理器的系统上，当线程池大小为N+1时，能实现最优利用率。</p>
+<p>对于包含I/O操作或其他阻塞操作时，由于线程不会一直执行，因此线程池的规模应该更大：</p>
+<p><strong>线程池大小=CPU数量<em>目标CPU利用率</em>(1+等待时间与运算时间的比率)</strong></p>
+<p>当然，CPU周期并不是唯一影响线程池大小的资源，还包括内存、文件句柄、套接字句柄和数据库连接等。计算每个任务对该资源的需求总量，然后用该资源的可用总量，除以每个任务的需求量，所得结果就是线程池大小的上限。</p>
+<h2 id="配置ThreadPoolExecutor"><a href="#配置ThreadPoolExecutor" class="headerlink" title="配置ThreadPoolExecutor"></a>配置ThreadPoolExecutor</h2><p>ThreadPoolExecutor的通用构造函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">                              <span class="keyword">int</span> maximumPoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">                              <span class="keyword">long</span> keepAliveTime,</span></span></span><br><span class="line"><span class="function"><span class="params">                              TimeUnit unit,</span></span></span><br><span class="line"><span class="function"><span class="params">                              BlockingQueue&lt;Runnable&gt; workQueue,</span></span></span><br><span class="line"><span class="function"><span class="params">                              ThreadFactory threadFactory,</span></span></span><br><span class="line"><span class="function"><span class="params">                              RejectedExecutionHandler handler)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="线程池的创建与销毁"><a href="#线程池的创建与销毁" class="headerlink" title="线程池的创建与销毁"></a>线程池的创建与销毁</h3><ol>
+<li>基本大小coolPoolSize：在没有任务执行时线程池的大小，并且只有在工作队列满了的情况下才会创建超出这个数量的线程。</li>
+<li>最大大小maximumPoolSize：可同时活动的线程数量的上限。</li>
+<li>存活时间keepAliveTime：如果某个线程的空闲时间超过了存活时间，那么将被标记为可回收的，并且当线程池的当前大小超过了基本大小时，这个线程将被终止。</li>
+</ol>
+<h3 id="管理队列任务"><a href="#管理队列任务" class="headerlink" title="管理队列任务"></a>管理队列任务</h3><p>ThreadPoolExecutor允许提供一个BlockingQueue来保存等待执行的任务。基本的任务排队方法有3种：无解队列、有界队列和同步移交（Synchronous HandOff）。</p>
+<p>newFixedThreadPool、newSingleThreadExecutor在默认情况下使用一个无界的LinkedBlockingQueue。如果所有工作者线程都在忙碌，那么任务将在队列中等待，如果任务持续快速到达，队列将无限增加。</p>
+<p>一种更稳妥的资源管理策略是使用有界队列，例如ArrayBlockingQueue、有界LinkedBlockingQueue、PriorityBlockingQueue。有界队列必须与饱和策略配合使用。</p>
+<p>对于非常大的或者无界线程池，可以使用SynchronousQueue来避免排队，以及直接将任务从生产者移交到工作者线程。要将一个元素放入SynchronousQueue，必须有一个线程在等待接受这个任务，如果没有线程在等待，且线程数量没有达到上限，那么将创建新的线程，否则根据饱和策略拒绝任务。newCachedThreadPool使用了SynchronousQueue。</p>
+<p>PriorityBlockingQueue将按照优先级来安排任务，任务的优先级是按照自然顺序或Comparator来定义的。</p>
+<p>只有当任务相互独立，为线程或工作队列设置界限才是合理的。如果任务之间存在依赖性，那么有界可能导致线程饥饿死锁，此时应该使用无界线程池，如newCachedThreadPool。</p>
+<h3 id="饱和策略"><a href="#饱和策略" class="headerlink" title="饱和策略"></a>饱和策略</h3><ul>
+<li>中止策略（AbortPolicy）：默认的饱和策略，该策略抛出RejectedExecutionException，调用者可以catch这个异常，根据需求编写处理代码。</li>
+<li>抛弃策略（DiscardPolicy）：悄悄地抛弃任务。</li>
+<li>抛弃最旧的策略（DiscardOldestPolicy）：抛弃下一个将要执行的任务，尝试提交新任务。</li>
+<li>调用者运行策略（CallerRunsPolicy）：不会在线程池中执行新任务，而是在调用了execute的线程中执行。</li>
+</ul>
+<h3 id="线程工厂"><a href="#线程工厂" class="headerlink" title="线程工厂"></a>线程工厂</h3><p>通过指定一个线程工厂方法，可以定制线程池的配置信息，如：</p>
+<ul>
+<li>指定线程名字</li>
+<li>设置自定义UncaughtExceptionHandler</li>
+<li>维护一些统计信息（如有多少个线程被创建、销毁）</li>
+<li>线程创建或者终止时打日志</li>
+</ul>
+<h3 id="在调用构造函数后再定制ThreadPoolExecutor"><a href="#在调用构造函数后再定制ThreadPoolExecutor" class="headerlink" title="在调用构造函数后再定制ThreadPoolExecutor"></a>在调用构造函数后再定制ThreadPoolExecutor</h3><p>可以调用ThreadPoolExecutor的setter方法来修改参数。</p>
+<p>Executors包含一个<code>unconfigurableExecutorService</code>方法将其装饰为ExecutorService接口，以防止执行策略被不信任的代码所修改。</p>
+<h2 id="扩展ThreadPoolExecutor"><a href="#扩展ThreadPoolExecutor" class="headerlink" title="扩展ThreadPoolExecutor"></a>扩展ThreadPoolExecutor</h2><p>可重写方法：<code>beforeExecute</code>, <code>afterExecute</code>, <code>terminated</code></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">避免活跃性危险</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/7取消与关闭/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">取消与关闭</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "线程池的使用",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>性能与可伸缩性 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="性能与可伸缩性我们虽然希望提升性能，但始终要把安全性放在第一位。首先要保证程序能正确运行，然后仅当程序的性能需求和测试结果要求程序执行得更快时，才应该设法提高他的运行速度。 对性能的思考多线程会引入一些额外的开销：  线程之间的协调（锁、触发信号、内存同步等） 增加的上下文切换 线程的创建与销毁 线程的调度  想要通过并发来提升性能，需要做好2件事：更高效地利用现有处理资源，以及出现新的处理资源时">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="性能与可伸缩性">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="性能与可伸缩性我们虽然希望提升性能，但始终要把安全性放在第一位。首先要保证程序能正确运行，然后仅当程序的性能需求和测试结果要求程序执行得更快时，才应该设法提高他的运行速度。 对性能的思考多线程会引入一些额外的开销：  线程之间的协调（锁、触发信号、内存同步等） 增加的上下文切换 线程的创建与销毁 线程的调度  想要通过并发来提升性能，需要做好2件事：更高效地利用现有处理资源，以及出现新的处理资源时">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.852Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="性能与可伸缩性">
+<meta name="twitter:description" content="性能与可伸缩性我们虽然希望提升性能，但始终要把安全性放在第一位。首先要保证程序能正确运行，然后仅当程序的性能需求和测试结果要求程序执行得更快时，才应该设法提高他的运行速度。 对性能的思考多线程会引入一些额外的开销：  线程之间的协调（锁、触发信号、内存同步等） 增加的上下文切换 线程的创建与销毁 线程的调度  想要通过并发来提升性能，需要做好2件事：更高效地利用现有处理资源，以及出现新的处理资源时">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">性能与可伸缩性</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">性能与可伸缩性</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#性能与可伸缩性"><span class="post-toc-number">1.</span> <span class="post-toc-text">性能与可伸缩性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对性能的思考"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">对性能的思考</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#性能与可伸缩性-1"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">性能与可伸缩性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#评估各种性能权衡因素"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">评估各种性能权衡因素</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Amdahl定律"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Amdahl定律</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#示例：在各种框架中隐藏的串行部分"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">示例：在各种框架中隐藏的串行部分</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Amdahl定律的应用"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">Amdahl定律的应用</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#线程引入的开销"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">线程引入的开销</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#上下文切换"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">上下文切换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#内存同步"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">内存同步</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#阻塞"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">阻塞</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#减少锁的竞争"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">减少锁的竞争</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#缩小锁的范围（“快进快出”）"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">缩小锁的范围（“快进快出”）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#减小锁的粒度"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">减小锁的粒度</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#锁分段"><span class="post-toc-number">1.4.3.</span> <span class="post-toc-text">锁分段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#避免热点域"><span class="post-toc-number">1.4.4.</span> <span class="post-toc-text">避免热点域</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#一些替代独占锁的方法"><span class="post-toc-number">1.4.5.</span> <span class="post-toc-text">一些替代独占锁的方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#检测CPU的利用率"><span class="post-toc-number">1.4.6.</span> <span class="post-toc-text">检测CPU的利用率</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#向对象池说不"><span class="post-toc-number">1.4.7.</span> <span class="post-toc-text">向对象池说不</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例：比较Map的性能"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">示例：比较Map的性能</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#减少上下文切换的开销"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">减少上下文切换的开销</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">性能与可伸缩性</h1>
+        <div class="post-meta">
+            <time datetime="2017-08-17T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-18
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="性能与可伸缩性"><a href="#性能与可伸缩性" class="headerlink" title="性能与可伸缩性"></a>性能与可伸缩性</h1><p>我们虽然希望提升性能，但始终要把安全性放在第一位。首先要保证程序能正确运行，然后仅当程序的性能需求和测试结果要求程序执行得更快时，才应该设法提高他的运行速度。</p>
+<h2 id="对性能的思考"><a href="#对性能的思考" class="headerlink" title="对性能的思考"></a>对性能的思考</h2><p>多线程会引入一些额外的开销：</p>
+<ul>
+<li>线程之间的协调（锁、触发信号、内存同步等）</li>
+<li>增加的上下文切换</li>
+<li>线程的创建与销毁</li>
+<li>线程的调度</li>
+</ul>
+<p>想要通过并发来提升性能，需要做好2件事：更高效地利用现有处理资源，以及出现新的处理资源时使程序尽可能利用这些资源。CPU需要尽可能保持忙碌。</p>
+<h3 id="性能与可伸缩性-1"><a href="#性能与可伸缩性-1" class="headerlink" title="性能与可伸缩性"></a>性能与可伸缩性</h3><p>程序的性能指标，一些（服务时间、等待时间）用于衡量程序的运行速度，即某个指定任务单元需要“多块”才能完成；另外一些指标（生产量、吞吐量）用于衡量“处理能力”，即在计算资源一定的情况下，能完成“多少”工作。</p>
+<blockquote>
+<p>可伸缩性：当增加计算资源（如CPU、内存、存储容量、I/O带宽）时，程序的吞吐量或者处理能力能相应地增加。</p>
+</blockquote>
+<p>可伸缩性设计与传统的性能调优方法截然不同：传统的性能调优通常是用更小的代价完成相同的工作，例如缓存重用计算结果，采用时间复杂度更优化的算法；在可伸缩性调优时，其目的是设法将计算并行化，从而利用更多的计算资源来完成更多的工作。</p>
+<p>性能的两个方面————“多快”和“多少”，是完全独立的，有时候甚至是相互矛盾的。我们熟悉的三层模型（表现层、逻辑层、持久层）就很好地说明了提高可伸缩性会造成性能损失的原因。</p>
+<p>对于服务器程序来说，“多少”这个问题————可伸缩性、吞吐量、生产量，往往比“多快”更受重视。</p>
+<h3 id="评估各种性能权衡因素"><a href="#评估各种性能权衡因素" class="headerlink" title="评估各种性能权衡因素"></a>评估各种性能权衡因素</h3><p>很多性能优化措施通常是以牺牲可读性或可维护性为代价————代码越“聪明”越“晦涩”，就越难以理解和维护。</p>
+<p>对性能的提升可能是并发错误的最大来源。</p>
+<h2 id="Amdahl定律"><a href="#Amdahl定律" class="headerlink" title="Amdahl定律"></a>Amdahl定律</h2><p>在增加计算资源的情况下，程序在理论上能够实现最高加速比，取决于程序中并行组件与串行组件所占的比重。假定F为必须串行的部分，在N个处理器的机器中，最高加速比为：</p>
+<p><strong>Speedup &lt;= 1 / (F + (1 - F) / N)</strong></p>
+<p>当N趋近无穷大时，最大的加速比趋近于1/F。</p>
+<p>在所有并发程序中都包含一些串行部分。如果你认为不存在串行部分，那么可以再仔细检查一遍。</p>
+<h3 id="示例：在各种框架中隐藏的串行部分"><a href="#示例：在各种框架中隐藏的串行部分" class="headerlink" title="示例：在各种框架中隐藏的串行部分"></a>示例：在各种框架中隐藏的串行部分</h3><p>举了一个从队列中取出任务并发处理的例子，来说明串行部分Queue取元素对可伸缩性的影响。</p>
+<h3 id="Amdahl定律的应用"><a href="#Amdahl定律的应用" class="headerlink" title="Amdahl定律的应用"></a>Amdahl定律的应用</h3><p>一些在4处理器系统中看似具有可伸缩性的算法，却可能含有一些隐藏的可伸缩性瓶颈，只是还没有遇到。</p>
+<p>在评估一个算法时，要考虑算数百上千个处理器时的性能表现，从而对可能出现的可伸缩性局限性有一定程度的认识。</p>
+<h2 id="线程引入的开销"><a href="#线程引入的开销" class="headerlink" title="线程引入的开销"></a>线程引入的开销</h2><h3 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h3><h3 id="内存同步"><a href="#内存同步" class="headerlink" title="内存同步"></a>内存同步</h3><blockquote>
+<p>不要过度担心非竞争同步带来的开销。这个基本的机制已经非常快了，并且JVM还能进行额外的优化以进一步降低或消除开销。因此，我们应该将优化的重点放在那些发生锁竞争的地方。</p>
+</blockquote>
+<h3 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h3><p>当线程无法获取某个锁或者由于在某个条件等待或者I/O操作上阻塞时，需要被挂起，在这个过程中将包含2次额外的上下文切换，以及所有必要的操作系统操作和缓存操作。</p>
+<h2 id="减少锁的竞争"><a href="#减少锁的竞争" class="headerlink" title="减少锁的竞争"></a>减少锁的竞争</h2><blockquote>
+<p>在并发程序中，对可伸缩性的最主要威胁就是独占方式的资源锁。</p>
+</blockquote>
+<p>有三种方式可以降低锁的竞争程度：</p>
+<ul>
+<li>减少锁的持有时间。</li>
+<li>降低锁的请求频率。</li>
+<li>使用带有协调机制的独占锁，这些机制允许更高的并发性。</li>
+</ul>
+<h3 id="缩小锁的范围（“快进快出”）"><a href="#缩小锁的范围（“快进快出”）" class="headerlink" title="缩小锁的范围（“快进快出”）"></a>缩小锁的范围（“快进快出”）</h3><p>将一些与锁无关的代码移出同步代码块，尤其是那些开销较大的操作，以及可能被阻塞的操作，如I/O操作。</p>
+<p>尽管缩小同步代码块能提高可伸缩性，但同步代码块不能过小————一些需要采用原子方式执行的操作，必须包含在一个同步块中。</p>
+<p>此外，同步需要一定的开销，当把一个同步代码分解为多个时，反而可能会对性能提升带来负面影响。</p>
+<p>在实际情况下，仅当可以将“大量”的计算，或阻塞操作从同步代码中移出，才应该考虑同步代码块的大小。</p>
+<h3 id="减小锁的粒度"><a href="#减小锁的粒度" class="headerlink" title="减小锁的粒度"></a>减小锁的粒度</h3><p>如果一个锁需要保护多个相互独立的状态变量，那么可以将这个锁分解为多个锁，并且每个锁只保护一个变量，从而降低每个锁被请求的频率，提高可伸缩性。</p>
+<p>使用的锁越多，发生死锁的风险就越大。</p>
+<h3 id="锁分段"><a href="#锁分段" class="headerlink" title="锁分段"></a>锁分段</h3><p>在某些情况下，可以将锁分解技术进一步扩展为对一组独立对象上的锁进行分解，成为锁分段。</p>
+<p>参考jdk中ConcurrentHashMap的实现原理。</p>
+<h3 id="避免热点域"><a href="#避免热点域" class="headerlink" title="避免热点域"></a>避免热点域</h3><p>一些常见的优化措施，如将反复计算的结果缓存起来，都会引入“热点域”，热点域往往会限制可伸缩性。</p>
+<p>如HashMap中size计数器，在多线程情况下，这个热点域就导致了难以提升的可伸缩性。ConcurrentHashMap为了避免size热点域，为每个分段维护了一个独立的技术，并通过每个分段的锁来维护这个值。</p>
+<h3 id="一些替代独占锁的方法"><a href="#一些替代独占锁的方法" class="headerlink" title="一些替代独占锁的方法"></a>一些替代独占锁的方法</h3><p>第三种降低竞争锁的影响的技术就是放弃使用独占锁，从而有助于使用一种友好并发的方式，如：</p>
+<ul>
+<li>并发容器</li>
+<li>读写锁：实现了在多个线程读取、单个写入情况下的加锁规则。</li>
+<li>不可变对象</li>
+<li>原子变量</li>
+</ul>
+<h3 id="检测CPU的利用率"><a href="#检测CPU的利用率" class="headerlink" title="检测CPU的利用率"></a>检测CPU的利用率</h3><p>Unix系统命令：<code>vmstat</code>/<code>mpstat</code>。</p>
+<p>如果CPU没有充分利用，通常原因有以下几种：</p>
+<ul>
+<li><strong>负载不充分</strong></li>
+<li><strong>I/O密集</strong>。可以通过<code>iostat</code>来判断应用是否是I/O密集型，或者检测网络的通信流量级别来判断它是否需要高带宽。</li>
+<li><strong>外部限制</strong>。如数据库、Web服务等。</li>
+<li><strong>锁竞争</strong>。</li>
+</ul>
+<p>如果CPU保持忙碌状态，那么可以使用监测工具来判断能否通过增加CPU来提升性能。在<code>vmstat</code>的输出中，有一栏信息是当前处于可运行状态但并没有运行（由于没有足够CPU）的线程数量，如果CPU利用率很高，并且总会有可运行线程在等待CPU，那么增加更多的处理器时，性能可能会得到提升。</p>
+<h3 id="向对象池说不"><a href="#向对象池说不" class="headerlink" title="向对象池说不"></a>向对象池说不</h3><p>在单线程程序中，尽管对象池能降低GC开销，但对于高开销对象之外的其他对象来说，仍然存在性能缺失。</p>
+<p>在并发程序中，对象池的表现更糟。如果多线程在对象池中请求对象，那么通常需要同步对象池的访问，从而使某个线程阻塞。阻塞的开销是内存分配操作的数百倍，因此对象池很可能带来可伸缩性瓶颈。</p>
+<h2 id="示例：比较Map的性能"><a href="#示例：比较Map的性能" class="headerlink" title="示例：比较Map的性能"></a>示例：比较Map的性能</h2><h2 id="减少上下文切换的开销"><a href="#减少上下文切换的开销" class="headerlink" title="减少上下文切换的开销"></a>减少上下文切换的开销</h2><p>举例说明：日志输出时，将写日志的I/O操作转移到了另一个用户感知不到开销的线程，消除了用户线程被I/O阻塞的机会，进而使用户线程快进快出，减少其他被持有的锁上发生竞争的机会。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/13显式锁/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">显式锁</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/10避免活跃性危险/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">避免活跃性危险</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "性能与可伸缩性",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/11性能与可伸缩性/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

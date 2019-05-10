@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>基础构建模块 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,多线程,读书笔记">
+  <meta name="description" content="基础构建模块Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。 同步容器类同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。 这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。 同步容器类的问题复合操作，如：迭代、跳转、条件运算等，需">
+<meta name="keywords" content="java,多线程,读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基础构建模块">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="基础构建模块Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。 同步容器类同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。 这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。 同步容器类的问题复合操作，如：迭代、跳转、条件运算等，需">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基础构建模块">
+<meta name="twitter:description" content="基础构建模块Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。 同步容器类同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。 这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。 同步容器类的问题复合操作，如：迭代、跳转、条件运算等，需">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">基础构建模块</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">基础构建模块</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#基础构建模块"><span class="post-toc-number">1.</span> <span class="post-toc-text">基础构建模块</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#同步容器类"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">同步容器类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#同步容器类的问题"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">同步容器类的问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#迭代器与ConcurrentModificationException"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">迭代器与ConcurrentModificationException</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#隐藏迭代器"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">隐藏迭代器</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#并发容器"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">并发容器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ConcurrentHashMap"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">ConcurrentHashMap</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#额外的原子Map操作"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">额外的原子Map操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CopyOnWriteArrayList"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">CopyOnWriteArrayList</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#阻塞队列和生产者-消费者模式"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">阻塞队列和生产者-消费者模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#串行线程封闭"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">串行线程封闭</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#双端队列与工作密取"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">双端队列与工作密取</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#阻塞方法与中断方法"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">阻塞方法与中断方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#同步工具类"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">同步工具类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#闭锁"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">闭锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FutureTask"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">FutureTask</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#信号量"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text">信号量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#栅栏"><span class="post-toc-number">1.5.4.</span> <span class="post-toc-text">栅栏</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/concurrency/Java并发编程实战学习笔记/5基础构建模块" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">基础构建模块</h1>
+        <div class="post-meta">
+            <time datetime="2017-08-02T16:00:00.000Z" itemprop="datePublished" class="post-time">
+  2017-08-03
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="基础构建模块"><a href="#基础构建模块" class="headerlink" title="基础构建模块"></a>基础构建模块</h1><p>Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。</p>
+<h2 id="同步容器类"><a href="#同步容器类" class="headerlink" title="同步容器类"></a>同步容器类</h2><p>同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。</p>
+<p>这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。</p>
+<h3 id="同步容器类的问题"><a href="#同步容器类的问题" class="headerlink" title="同步容器类的问题"></a>同步容器类的问题</h3><p>复合操作，如：迭代、跳转、条件运算等，需要额外的客户端加锁来保证线程安全性。</p>
+<h3 id="迭代器与ConcurrentModificationException"><a href="#迭代器与ConcurrentModificationException" class="headerlink" title="迭代器与ConcurrentModificationException"></a>迭代器与ConcurrentModificationException</h3><p>在设计同步容器类的迭代器时并没有考虑到并发修改的问题，并且表现出的行为是“及时失败”（fail-fast）：当发现容器在迭代时被修改，会抛出ConcurrentModificationException。</p>
+<p>在迭代过程中持有容器的锁，可以避免ConcurrentModificationException，但长期持有锁可能会造成饥饿或者死锁，降低程序的可伸缩性。</p>
+<p>如果不希望加锁，那么替代方式就是克隆容器，在副本上迭代。但是克隆容器时存在着显著的性能开销。</p>
+<h3 id="隐藏迭代器"><a href="#隐藏迭代器" class="headerlink" title="隐藏迭代器"></a>隐藏迭代器</h3><p>容器的toString()/hashCode()/equals()方法，都可能间接迭代容器，造成ConcurrentModificationException异常。</p>
+<h2 id="并发容器"><a href="#并发容器" class="headerlink" title="并发容器"></a>并发容器</h2><p>通过并发容器来替代同步容器，可以极大地提高伸缩性并降低风险。</p>
+<h3 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h3><p>实现机制：分段锁</p>
+<h3 id="额外的原子Map操作"><a href="#额外的原子Map操作" class="headerlink" title="额外的原子Map操作"></a>额外的原子Map操作</h3><p>增加了一些常见的复合操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ConcurrentMap</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Map</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">putIfAbsent</span><span class="params">(K key, V value)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">remove</span><span class="params">(K key, V value)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">replace</span><span class="params">(K key, V oldValue, V newValue)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">replace</span><span class="params">(K key, V newValue)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><p>“写入时复制”容器每次修改时，都会创建并重新发布一个新的容器副本。</p>
+<p>仅当迭代操作远远多于复制操作时，才应该使用“写入时复制”容器，这个准则很好地描述了许多事件通知系统：大多数情况下，注册、注销监听器的操作远少于接收事件并分发通知的操作。</p>
+<h2 id="阻塞队列和生产者-消费者模式"><a href="#阻塞队列和生产者-消费者模式" class="headerlink" title="阻塞队列和生产者-消费者模式"></a>阻塞队列和生产者-消费者模式</h2><p>在构建高可靠的应用程序时，有界队列是一种强大的资源管理工具：它能够抑制并防止产生过多的工作项，使应用程序在负荷过载的情况下变得更加健壮。</p>
+<h3 id="串行线程封闭"><a href="#串行线程封闭" class="headerlink" title="串行线程封闭"></a>串行线程封闭</h3><p>对于可变对象，阻塞队列促进了串行线程封闭，将对象的所有权从生产者交付给消费者。线程封闭对象只能由单个线程拥有，独占访问权。</p>
+<h3 id="双端队列与工作密取"><a href="#双端队列与工作密取" class="headerlink" title="双端队列与工作密取"></a>双端队列与工作密取</h3><p>BlockingDeque</p>
+<p>应用场景看不懂</p>
+<h2 id="阻塞方法与中断方法"><a href="#阻塞方法与中断方法" class="headerlink" title="阻塞方法与中断方法"></a>阻塞方法与中断方法</h2><h2 id="同步工具类"><a href="#同步工具类" class="headerlink" title="同步工具类"></a>同步工具类</h2><h3 id="闭锁"><a href="#闭锁" class="headerlink" title="闭锁"></a>闭锁</h3><p>闭锁可以用来确保某些活动直到其他活动都完成后才继续执行。</p>
+<p>CountDownLatch#await()/countDown()</p>
+<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><p>FutureTask实现了Future语义，表示一种抽象的可生成结果的计算。FutureTask表示的计算是通过Callable实现的，相当于一种可生成结果的Runnable，并处于三种状态：等待运行、正在运行、运行完成。</p>
+<p>FutureTask.get()取决于任务的状态，如果任务已经完成，那么get立即返回结果，否则get将阻塞直到任务进入完成状态，然后返回结果或抛出异常。</p>
+<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>计数信号量用来控制同时访问某个特定资源的操作数量，或者同时执行某个操作的数量。</p>
+<p>Semaphore管理着一组虚拟的许可，许可的初始数量可通过构造函数指定。在执行操作时可以首先获得许可，使用后释放许可。如果没有许可，acquire将阻塞直至有许可。</p>
+<h3 id="栅栏"><a href="#栅栏" class="headerlink" title="栅栏"></a>栅栏</h3><p>栅栏（Barrier）类似于闭锁，能阻塞一组线程直到某个事件发生。栅栏的区别在于，所有线程必须同时到达栅栏位置，才能继续执行。闭锁用于等待事件，栅栏用于等待其他线程。例如：所有人6:00在麦当劳碰头，到了以后要等其它人，人齐了才能走。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/6任务执行/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">任务执行</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/4对象的组合/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">对象的组合</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "基础构建模块",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

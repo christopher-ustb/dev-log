@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>由一个bug窥探angular双向绑定的秘密 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="Javascript,angularjs">
+  <meta name="description" content="由一个bug窥探angular双向绑定的秘密bug背景简述我试图封装一个“一加一减的数字输入框”的指令，点击左边的减号可以将输入框里的数字减一，点击右边的加号可以加一，这样的控件在电商网站的订单页面选择商品数量时十分常见。 我的指令代码如下：12345&amp;lt;span&amp;gt;  &amp;lt;a href=&quot;javascript: void(0);&quot; ng-click=&quot;addValue(-1)&quot;&amp;gt">
+<meta name="keywords" content="Javascript,angularjs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="由一个bug窥探angular双向绑定的秘密">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/javascript/angularjs/由一个bug窥探angular双向绑定的秘密/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="由一个bug窥探angular双向绑定的秘密bug背景简述我试图封装一个“一加一减的数字输入框”的指令，点击左边的减号可以将输入框里的数字减一，点击右边的加号可以加一，这样的控件在电商网站的订单页面选择商品数量时十分常见。 我的指令代码如下：12345&amp;lt;span&amp;gt;  &amp;lt;a href=&quot;javascript: void(0);&quot; ng-click=&quot;addValue(-1)&quot;&amp;gt">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.872Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="由一个bug窥探angular双向绑定的秘密">
+<meta name="twitter:description" content="由一个bug窥探angular双向绑定的秘密bug背景简述我试图封装一个“一加一减的数字输入框”的指令，点击左边的减号可以将输入框里的数字减一，点击右边的加号可以加一，这样的控件在电商网站的订单页面选择商品数量时十分常见。 我的指令代码如下：12345&amp;lt;span&amp;gt;  &amp;lt;a href=&quot;javascript: void(0);&quot; ng-click=&quot;addValue(-1)&quot;&amp;gt">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">由一个bug窥探angular双向绑定的秘密</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">由一个bug窥探angular双向绑定的秘密</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#由一个bug窥探angular双向绑定的秘密"><span class="post-toc-number">1.</span> <span class="post-toc-text">由一个bug窥探angular双向绑定的秘密</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#bug背景简述"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">bug背景简述</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#angular如何实现双向数据绑定"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">angular如何实现双向数据绑定</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#由dom元素上的ng-model向scope中的属性绑定"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">由dom元素上的ng-model向scope中的属性绑定</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#由scope中的属性值变化向dom树的元素内容绑定"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">由scope中的属性值变化向dom树的元素内容绑定</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#分析问题"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">分析问题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#解决问题"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">解决问题</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-javascript/angularjs/由一个bug窥探angular双向绑定的秘密" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">由一个bug窥探angular双向绑定的秘密</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-09T14:16:24.000Z" itemprop="datePublished" class="post-time">
+  2016-10-09
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Javascript/">Javascript</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="由一个bug窥探angular双向绑定的秘密"><a href="#由一个bug窥探angular双向绑定的秘密" class="headerlink" title="由一个bug窥探angular双向绑定的秘密"></a>由一个bug窥探angular双向绑定的秘密</h1><h2 id="bug背景简述"><a href="#bug背景简述" class="headerlink" title="bug背景简述"></a>bug背景简述</h2><p>我试图封装一个“一加一减的数字输入框”的指令，点击左边的减号可以将输入框里的数字减一，点击右边的加号可以加一，这样的控件在电商网站的订单页面选择商品数量时十分常见。</p>
+<p>我的指令代码如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript: void(0);"</span> <span class="attr">ng-click</span>=<span class="string">"addValue(-1)"</span>&gt;</span>-<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">ng-model</span>=<span class="string">"value"</span> <span class="attr">ng-change</span>=<span class="string">"onValueChange()"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript: void(0);"</span> <span class="attr">ng-click</span>=<span class="string">"addValue(1)"</span>&gt;</span>+<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">angular.module(<span class="string">'app'</span>).directive(<span class="string">'numberInput'</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    restrict: <span class="string">'E'</span>,</span><br><span class="line">    replace: <span class="literal">true</span>,</span><br><span class="line">    scope: &#123;</span><br><span class="line">      value: <span class="string">'='</span>,</span><br><span class="line">      onValueChange: <span class="string">'&amp;'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    templateUrl: <span class="string">'components/number-input/number-input.html'</span>,</span><br><span class="line">    controller: <span class="function"><span class="keyword">function</span> (<span class="params">$scope</span>) </span>&#123;</span><br><span class="line">      $scope.addValue = <span class="function"><span class="keyword">function</span> (<span class="params">stepValue</span>) </span>&#123;</span><br><span class="line">        $scope.value = $scope.value + stepValue;</span><br><span class="line">        $scope.onValueChange();</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>scope隔离了两个对象：</p>
+<ul>
+<li><p>value</p>
+<p>  ‘=’双向绑定了内外层scope.value，使父级scope可以指定input的值，input被操作后的值也可以同步到父级scope。</p>
+</li>
+<li><p>onValueChange</p>
+<p>  ‘&amp;’将外层函数传入scope，当value值发生变化时执行此函数</p>
+</li>
+</ul>
+<hr>
+<p>我尝试使用这个指令：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">number-input</span> <span class="attr">value</span>=<span class="string">"cart.quantity"</span> <span class="attr">on-value-change</span>=<span class="string">"updateQuantity(cart.quantity)"</span>&gt;</span><span class="tag">&lt;/<span class="name">number-input</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$scope.updateQuantity = <span class="function"><span class="keyword">function</span>(<span class="params">quantity</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'quantity'</span>, quantity);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>bug出现：</p>
+<p>当input中是1，我点击加号，使cart.quantity加到2时，updateQuantity方法被执行，但是打印的结果是1不是2。</p>
+<p>直观bug判断：</p>
+<p>两个scope对象的隔离都是达到预期的，这个bug体现了value值的动态绑定晚于我们的预期，即在onValueChange执行之后才改变了父级value的值。</p>
+<p>那么问题来了：</p>
+<p>value的值到底是什么时候通过何种方式同步到父级scope中去的呢？</p>
+<h2 id="angular如何实现双向数据绑定"><a href="#angular如何实现双向数据绑定" class="headerlink" title="angular如何实现双向数据绑定"></a>angular如何实现双向数据绑定</h2><p><code>以下都是个人理解，源代码没撸通，有错误概不负责</code></p>
+<p><strong>如果类比java的23种设计模式，angular实现双向数据绑定的核心，是两个无处不在的“代理模式”和“观察者模式”</strong></p>
+<h3 id="由dom元素上的ng-model向scope中的属性绑定"><a href="#由dom元素上的ng-model向scope中的属性绑定" class="headerlink" title="由dom元素上的ng-model向scope中的属性绑定"></a>由dom元素上的ng-model向scope中的属性绑定</h3><p>angular在初始化dom树的时候，遍历所有带有ng-model属性的元素，并将其类似onChange的函数表达式取出来，、<br>用一个代理方法在执行了原有的逻辑之后，将ng-model的值赋予到scope[attributes[ng-model]]上去。</p>
+<p>由于js中function也是对象，所以代码上不需要像java的代理模式那样手动或者使用动态字节码技术（如CGlib）生成一个子类来重写原有方法。</p>
+<h3 id="由scope中的属性值变化向dom树的元素内容绑定"><a href="#由scope中的属性值变化向dom树的元素内容绑定" class="headerlink" title="由scope中的属性值变化向dom树的元素内容绑定"></a>由scope中的属性值变化向dom树的元素内容绑定</h3><p>angular在初始化dom树时，将带有ng-bind、ng-model、表达式的元素以及表达式内容，<br>保存在一个观察者序列中。如果仔细查看angular的scope对象，会发现其中<strong>private</strong>属性中有一个$$watcher数组，<br>这个就是观察者模式中的订阅者，随时准备被scope通知到表达式值发生变化。<br>至于变化后如何改变dom，那就是写普通的js操作dom，无须赘述。</p>
+<p>那么，当某件事情发生时，反复遍历$$watcher中的表达式有没有变化，<br>由于这样的遍历属于脏检测，检查效率也常常被不使用双向绑定或者使用基于setter机制的绑定技术使用者所诟病。</p>
+<p>而这个检测同步的过程，就是大名鼎鼎的<strong>digest cycle</strong>（消化循环？？）</p>
+<p>有个问题困扰了我很久，那就是上文所说的“某件事情”到底是什么事情，angular如何得知scope中的属性发生了变化。<br>我甚至像某些误人子弟的博主一样，想到了是不是使用了定时任务轮询式检查。</p>
+<p>然而angular的开发者是不可能这么僵化的，他们对网页中模型值变化的原因做了一个精彩绝伦的抽象与概括：</p>
+<ul>
+<li>dom事件，如点击、输入(ng-click)</li>
+<li>xhr网络响应($http)</li>
+<li>浏览器Location变化($location)</li>
+<li>Timer事件($timeout)</li>
+</ul>
+<p>于是angular只需要将这些事件用自己的模块封装起来，在事件发生时，触发digest cycle，那么$$watcher中的元素就会被改变，就实现了数据绑定。</p>
+<p>这也解释了为什么在angular中使用很多jQuery插件时，经常出现双向绑定失败的情况，<br>就是因为这些插件以jQuery的方式，避开了上面列出的事件操作了dom树，根本就没有进入digest cycle，双向绑定不可能凭空发生。</p>
+<p>当然了，angular还是会把钩子留给开发者，那就是$apply/$digest方法。</p>
+<p>但是在finally会触发digest cycle的方法中手动调用$digest，就会抛出<code>digest cycle in progress</code>错误，因为不可能需要同时运行2个digest cycle来脏检测数据。</p>
+<h2 id="分析问题"><a href="#分析问题" class="headerlink" title="分析问题"></a>分析问题</h2><p>于是，这个bug就很容易解释了：</p>
+<p>当onValueChange执行时，digest cycle还没开始，父级scope的值还没有发生同步的变化，所以打1没打2。</p>
+<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>目前有2种思路：</p>
+<ul>
+<li>将双向绑定的值改成一个对象类型，即共享同一个指针，实际的值是对象的属性，这样就不需要digest cycle，子scope中跟父scope是同一份数据。</li>
+<li>将onValueChange的执行时机改成digest cycle之后，或者提前用$timeout(onValueChange)触发digest cycle</li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/javascript/angularjs/由一个bug窥探angular双向绑定的秘密/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/javascript/angularjs/由一个bug窥探angular双向绑定的秘密/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Javascript/">Javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/angularjs/">angularjs</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/订单合并支付数据表设计/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">订单合并支付数据表设计</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/design/用户标签数据结构设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">用户标签数据结构设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "由一个bug窥探angular双向绑定的秘密",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/javascript/angularjs/由一个bug窥探angular双向绑定的秘密/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

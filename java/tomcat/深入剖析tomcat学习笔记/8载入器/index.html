@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>载入器 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,读书笔记,tomcat">
+  <meta name="description" content="载入器载入器是Catalina最重要的组件，servlet容器需要实现一个自定义的类载入器，出于以下原因：  将WEB-INF/classes目录下的应用类与更高级别的容器类用不同的classloader隔离开来 根据classes文件是否发生变化实现类的自动重新装载  Java的类加载器类加载器的双亲委托模型 Loader接口Loader接口指的是Web应用程序载入器，而不仅仅是类载入器。 12">
+<meta name="keywords" content="java,读书笔记,tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="载入器">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/8载入器/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="载入器载入器是Catalina最重要的组件，servlet容器需要实现一个自定义的类载入器，出于以下原因：  将WEB-INF/classes目录下的应用类与更高级别的容器类用不同的classloader隔离开来 根据classes文件是否发生变化实现类的自动重新装载  Java的类加载器类加载器的双亲委托模型 Loader接口Loader接口指的是Web应用程序载入器，而不仅仅是类载入器。 12">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.869Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="载入器">
+<meta name="twitter:description" content="载入器载入器是Catalina最重要的组件，servlet容器需要实现一个自定义的类载入器，出于以下原因：  将WEB-INF/classes目录下的应用类与更高级别的容器类用不同的classloader隔离开来 根据classes文件是否发生变化实现类的自动重新装载  Java的类加载器类加载器的双亲委托模型 Loader接口Loader接口指的是Web应用程序载入器，而不仅仅是类载入器。 12">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">载入器</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">载入器</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#载入器"><span class="post-toc-number">1.</span> <span class="post-toc-text">载入器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Java的类加载器"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Java的类加载器</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Loader接口"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Loader接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#WebappLoader类"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">WebappLoader类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#创建类加载器"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">创建类加载器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#设置仓库"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">设置仓库</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#设置类路径"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">设置类路径</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#设置访问权限"><span class="post-toc-number">1.3.4.</span> <span class="post-toc-text">设置访问权限</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#开启新线程执行类的重新载入"><span class="post-toc-number">1.3.5.</span> <span class="post-toc-text">开启新线程执行类的重新载入</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#WebappClassLoader类"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">WebappClassLoader类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#类缓存"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">类缓存</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#载入类"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">载入类</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/tomcat/深入剖析tomcat学习笔记/8载入器" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">载入器</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-08T06:14:35.000Z" itemprop="datePublished" class="post-time">
+  2016-11-08
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="载入器"><a href="#载入器" class="headerlink" title="载入器"></a>载入器</h1><p>载入器是Catalina最重要的组件，servlet容器需要实现一个自定义的类载入器，出于以下原因：</p>
+<ul>
+<li>将WEB-INF/classes目录下的应用类与更高级别的容器类用不同的classloader隔离开来</li>
+<li>根据classes文件是否发生变化实现类的自动重新装载</li>
+</ul>
+<h2 id="Java的类加载器"><a href="#Java的类加载器" class="headerlink" title="Java的类加载器"></a>Java的类加载器</h2><p>类加载器的双亲委托模型</p>
+<h2 id="Loader接口"><a href="#Loader接口" class="headerlink" title="Loader接口"></a>Loader接口</h2><p>Loader接口指的是Web应用程序载入器，而不仅仅是类载入器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Loader</span> </span>&#123;</span><br><span class="line">    <span class="comment">// properties</span></span><br><span class="line">    <span class="comment">// 使用的classloader实例</span></span><br><span class="line">    <span class="function">ClassLoader <span class="title">getClassLoader</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// 绑定的context级别的container</span></span><br><span class="line">    <span class="function">Container <span class="title">getContainer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">DefaultContext <span class="title">getDefaultContext</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// 是否委托给一个父类载入器</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">getDelegate</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">String <span class="title">getInfo</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// 是否支持自动重载</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">getReloadable</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// method</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addPropertyChangeListener</span><span class="params">(PropertyChangeListener listener)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addRepository</span><span class="params">(String repository)</span></span>;</span><br><span class="line">    String[] findRepositories();</span><br><span class="line">    <span class="comment">// 仓库中的class被修改了，触发类重新加载事件</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">modified</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removePropertyChangeListener</span><span class="params">(PropertyChangeListener listener)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="WebappLoader类"><a href="#WebappLoader类" class="headerlink" title="WebappLoader类"></a>WebappLoader类</h2><p>WebappLoader类实现了Loader接口，其实例就是Web应用的载入器。<br>像其他Catalina组件一样，WebappLoader类也实现了Lifecycle接口，可以由其关联的容器来启动、关闭组件。<br>此外，WebappLoader类还实现了Runnable接口，可以指定一个线程来不断调用modifed()方法来检查class是否被修改。</p>
+<p>当调用WebappLoader类的start()方法时，会完成以下工作：</p>
+<h3 id="创建类加载器"><a href="#创建类加载器" class="headerlink" title="创建类加载器"></a>创建类加载器</h3><p>WebappLoader类并没有声明setClassLoader()方法来直接设置classloader，而是声明了setLoaderClass()来设置其私有变量loaderClass的值。这个私有变量保存了字符串类型的classloader类全名，其默认值是<code>&quot;org.apache.catalina.loader.WebappClassLoader&quot;</code>。</p>
+<p>WebappLoader类在启动时调用其方法createClassLoader()来创建类加载器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> WebappClassLoader <span class="title">createClassLoader</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    Class clazz = Class.forName(loaderClass);</span><br><span class="line">    WebappClassLoader classLoader = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (parentClassLoader == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Will cause a ClassCast is the class does not extend WCL, but</span></span><br><span class="line">        <span class="comment">// this is on purpose (the exception will be caught and rethrown)</span></span><br><span class="line">        classLoader = (WebappClassLoader) clazz.newInstance();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Class[] argTypes = &#123; ClassLoader.class &#125;;</span><br><span class="line">        Object[] args = &#123; parentClassLoader &#125;;</span><br><span class="line">        Constructor constr = clazz.getConstructor(argTypes);</span><br><span class="line">        classLoader = (WebappClassLoader) constr.newInstance(args);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> classLoader;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="设置仓库"><a href="#设置仓库" class="headerlink" title="设置仓库"></a>设置仓库</h3><p>调用setRepositories()方法，利用classloader.addRepository()将<code>&quot;/WEB-INF/classes&quot;</code>新增仓库，利用classLoader.setJarPath()将<code>&quot;/WEB-INF/lib&quot;</code>设置为jar仓库。</p>
+<h3 id="设置类路径"><a href="#设置类路径" class="headerlink" title="设置类路径"></a>设置类路径</h3><p>调用setClassPath()方法，解析classloader链条中的repository集合，组装classpath信息。</p>
+<h3 id="设置访问权限"><a href="#设置访问权限" class="headerlink" title="设置访问权限"></a>设置访问权限</h3><p>调用setPermissions()方法为类载入器设置访问相关目录的权限。</p>
+<h3 id="开启新线程执行类的重新载入"><a href="#开启新线程执行类的重新载入" class="headerlink" title="开启新线程执行类的重新载入"></a>开启新线程执行类的重新载入</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Loop until the termination semaphore is set</span></span><br><span class="line">    <span class="keyword">while</span> (!threadDone) &#123;</span><br><span class="line">        <span class="comment">// Wait for our check interval</span></span><br><span class="line">        threadSleep();</span><br><span class="line">        <span class="keyword">if</span> (!started)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Perform our modification check</span></span><br><span class="line">            <span class="keyword">if</span> (!classLoader.modified())</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log(sm.getString(<span class="string">"webappLoader.failModifiedCheck"</span>), e);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Handle a need for reloading</span></span><br><span class="line">        notifyContext();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>循环调用classLoader.modified()方法检查是否被修改。一旦为true，通知context容器去重新载入类。</p>
+<h2 id="WebappClassLoader类"><a href="#WebappClassLoader类" class="headerlink" title="WebappClassLoader类"></a>WebappClassLoader类</h2><p>WebappClassLoader类的设计方案考虑到了优化和安全两方面，例如：</p>
+<ul>
+<li>缓存之前已经载入成功或失败的类来提升性能</li>
+<li>禁止载入指定类（如javax.servlet.Servlet）</li>
+<li>委托系统类载入器载入指定包下的类(如javax, org.xml.sax等)</li>
+</ul>
+<h3 id="类缓存"><a href="#类缓存" class="headerlink" title="类缓存"></a>类缓存</h3><p>每个由WebappClassLoader载入的类都被视作“资源”，对应class是org.apache.catalina.loader.ResourceEntry</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResourceEntry</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">long</span> lastModified = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] binaryContent = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> Class loadedClass = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> URL source = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> URL codeBase = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> Manifest manifest = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> Certificate[] certificates = <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所有已加载的类都保存在<code>protected HashMap resourceEntries</code>中，其key就是资源的名称。<br>所有载入失败的类都保存在<code>protected HashMap notFoundResources</code>中。</p>
+<h3 id="载入类"><a href="#载入类" class="headerlink" title="载入类"></a>载入类</h3><p>载入类时，遵循如下规则：</p>
+<ol>
+<li>先检查本地缓存</li>
+<li>如果本地缓存中没有，则检查上一层缓存，即调用java.lang.ClassLoader#findLoadedClass(String)方法</li>
+<li>若2个缓存都没有，则使用系统的类载入器加载，防止Web应用中的类覆盖JEE类</li>
+<li>若采用了SecurityManager，则检查是否允许载入该类</li>
+<li>若打开delegate标志位，或待载入的类属于<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Set of package names which are not allowed to be loaded from a webapp</span></span><br><span class="line"><span class="comment">* class loader without delegating first.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] packageTriggers = &#123;</span><br><span class="line">   <span class="string">"javax"</span>,                                     <span class="comment">// Java extensions</span></span><br><span class="line">   <span class="string">"org.xml.sax"</span>,                               <span class="comment">// SAX 1 &amp; 2</span></span><br><span class="line">   <span class="string">"org.w3c.dom"</span>,                               <span class="comment">// DOM 1 &amp; 2</span></span><br><span class="line">   <span class="string">"org.apache.xerces"</span>,                         <span class="comment">// Xerces 1 &amp; 2</span></span><br><span class="line">   <span class="string">"org.apache.xalan"</span>                           <span class="comment">// Xalan</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>则委托父载入器来加载相关类</p>
+<ol>
+<li>从仓库中加载类</li>
+<li>如果delegate关闭，委托父载入器加载类</li>
+<li>抛出ClassNotFoundException</li>
+</ol>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/8载入器/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/8载入器/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/http缓存机制及nginx相关配置/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">http缓存机制及nginx相关配置</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/7日志记录器/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">日志记录器</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "载入器",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/8载入器/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>犁书重构规划 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="lebooks-private,重构,面向对象,解耦">
+  <meta name="description" content="犁书重构规划乐书网络内部开发分享，非相关人员忽略 重构核心任务整合B端/C端服务相当于不同的产品：  微信书、微博书、QQ书 简书 指南猫书 诗歌书  主要区别：  数据来源 排版方式 支付、结算方式  前后端分离jsp与SPA混合 将用户页面与管理平台归并入两个webapp mock框架模拟未完成的rest api ：Swagger 引入Maven，确定服务模块边界，规范模块化水平模块之间失去了">
+<meta name="keywords" content="lebooks-private,重构,面向对象,解耦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="犁书重构规划">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/lebooks/犁书重构规划/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="犁书重构规划乐书网络内部开发分享，非相关人员忽略 重构核心任务整合B端/C端服务相当于不同的产品：  微信书、微博书、QQ书 简书 指南猫书 诗歌书  主要区别：  数据来源 排版方式 支付、结算方式  前后端分离jsp与SPA混合 将用户页面与管理平台归并入两个webapp mock框架模拟未完成的rest api ：Swagger 引入Maven，确定服务模块边界，规范模块化水平模块之间失去了">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.875Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="犁书重构规划">
+<meta name="twitter:description" content="犁书重构规划乐书网络内部开发分享，非相关人员忽略 重构核心任务整合B端/C端服务相当于不同的产品：  微信书、微博书、QQ书 简书 指南猫书 诗歌书  主要区别：  数据来源 排版方式 支付、结算方式  前后端分离jsp与SPA混合 将用户页面与管理平台归并入两个webapp mock框架模拟未完成的rest api ：Swagger 引入Maven，确定服务模块边界，规范模块化水平模块之间失去了">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">犁书重构规划</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">犁书重构规划</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#犁书重构规划"><span class="post-toc-number">1.</span> <span class="post-toc-text">犁书重构规划</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#重构核心任务"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">重构核心任务</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#整合B端-C端服务"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">整合B端/C端服务</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#前后端分离"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">前后端分离</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#引入Maven，确定服务模块边界，规范模块化"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">引入Maven，确定服务模块边界，规范模块化</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#加入单元测试"><span class="post-toc-number">1.1.4.</span> <span class="post-toc-text">加入单元测试</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#消息队列解耦模块，异步处理支线流程"><span class="post-toc-number">1.1.5.</span> <span class="post-toc-text">消息队列解耦模块，异步处理支线流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#注意事项"><span class="post-toc-number">1.1.6.</span> <span class="post-toc-text">注意事项</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-lebooks/犁书重构规划" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">犁书重构规划</h1>
+        <div class="post-meta">
+            <time datetime="2016-12-14T02:08:46.000Z" itemprop="datePublished" class="post-time">
+  2016-12-14
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="犁书重构规划"><a href="#犁书重构规划" class="headerlink" title="犁书重构规划"></a>犁书重构规划</h1><p><strong>乐书网络内部开发分享，非相关人员忽略</strong></p>
+<h2 id="重构核心任务"><a href="#重构核心任务" class="headerlink" title="重构核心任务"></a>重构核心任务</h2><h3 id="整合B端-C端服务"><a href="#整合B端-C端服务" class="headerlink" title="整合B端/C端服务"></a>整合B端/C端服务</h3><p>相当于不同的产品：</p>
+<ul>
+<li>微信书、微博书、QQ书</li>
+<li>简书</li>
+<li>指南猫书</li>
+<li>诗歌书</li>
+</ul>
+<p>主要区别：</p>
+<ul>
+<li>数据来源</li>
+<li>排版方式</li>
+<li>支付、结算方式</li>
+</ul>
+<h3 id="前后端分离"><a href="#前后端分离" class="headerlink" title="前后端分离"></a>前后端分离</h3><p>jsp与SPA混合</p>
+<p>将用户页面与管理平台归并入两个webapp</p>
+<p>mock框架模拟未完成的rest api ：Swagger</p>
+<h3 id="引入Maven，确定服务模块边界，规范模块化"><a href="#引入Maven，确定服务模块边界，规范模块化" class="headerlink" title="引入Maven，确定服务模块边界，规范模块化"></a>引入Maven，确定服务模块边界，规范模块化</h3><p>水平模块之间失去了边界，互相环形依赖，牵一发而动全身</p>
+<p><a href="https://www.processon.com/view/link/58578d96e4b0c1fa6c5cd4f5" target="_blank" rel="noopener">https://www.processon.com/view/link/58578d96e4b0c1fa6c5cd4f5</a></p>
+<ol>
+<li>树形依赖，代码上严禁基础模块向附加模块的依赖，如用户模块依赖分销模块</li>
+<li>面向接口设计</li>
+</ol>
+<p>拆分：</p>
+<ol>
+<li>从业务逻辑上思考业务模型真正的依赖关系</li>
+<li>是否依赖整个数据模型，即数据层依赖</li>
+<li>如果只是依赖部分行为，则将被依赖的部分设计成接口，高层模块只依赖低层模块的接口</li>
+</ol>
+<h3 id="加入单元测试"><a href="#加入单元测试" class="headerlink" title="加入单元测试"></a>加入单元测试</h3><p>使用spring-test的测试组件，主要是MockHttpServletRequest对象来测试rest-api接口，依赖注入来测试供其他业务模块调用的service接口。</p>
+<h3 id="消息队列解耦模块，异步处理支线流程"><a href="#消息队列解耦模块，异步处理支线流程" class="headerlink" title="消息队列解耦模块，异步处理支线流程"></a>消息队列解耦模块，异步处理支线流程</h3><h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>先定义高层级对外接口及其测试代码，往下重构，避免遗漏，减少对外特性变化</li>
+<li>重构数据库结构时，必须留下SQL脚本备份，严禁直接使用图形化界面修改本地数据表就算完成任务</li>
+<li>代码审查</li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/lebooks/犁书重构规划/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/lebooks/犁书重构规划/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/lebooks-private/">lebooks-private</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/解耦/">解耦</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/重构/">重构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/面向对象/">面向对象</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/隐式依赖也是依赖/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">隐式依赖也是依赖</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/javascript/单线程的javascript/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">单线程的javascript</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "犁书重构规划",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/lebooks/犁书重构规划/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>电商系统运费计算模块设计 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="数据结构设计">
+  <meta name="description" content="电商系统运费计算模块设计本文试图做一个模型设计上的思考试验，试图在需求没有细化、很有可能需要变更的情况下，做一个高度弹性、能充分应对需求变更的数据结构设计。 而电商系统的运费计算模板设计，是一个很常见的功能，虽然每个系统可能有一些定制化的要求，但总体的方式应该是在一定范围内的，主要参考淘宝、京东（有自营店）的常见方式。 所以以此做一个数据结构设计训练的发端与范例。 总体需求说明系统能够根据客户选择">
+<meta name="keywords" content="数据结构设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="电商系统运费计算模块设计">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/design/电商系统运费计算模块设计/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="电商系统运费计算模块设计本文试图做一个模型设计上的思考试验，试图在需求没有细化、很有可能需要变更的情况下，做一个高度弹性、能充分应对需求变更的数据结构设计。 而电商系统的运费计算模板设计，是一个很常见的功能，虽然每个系统可能有一些定制化的要求，但总体的方式应该是在一定范围内的，主要参考淘宝、京东（有自营店）的常见方式。 所以以此做一个数据结构设计训练的发端与范例。 总体需求说明系统能够根据客户选择">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.849Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="电商系统运费计算模块设计">
+<meta name="twitter:description" content="电商系统运费计算模块设计本文试图做一个模型设计上的思考试验，试图在需求没有细化、很有可能需要变更的情况下，做一个高度弹性、能充分应对需求变更的数据结构设计。 而电商系统的运费计算模板设计，是一个很常见的功能，虽然每个系统可能有一些定制化的要求，但总体的方式应该是在一定范围内的，主要参考淘宝、京东（有自营店）的常见方式。 所以以此做一个数据结构设计训练的发端与范例。 总体需求说明系统能够根据客户选择">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">电商系统运费计算模块设计</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">电商系统运费计算模块设计</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#电商系统运费计算模块设计"><span class="post-toc-number">1.</span> <span class="post-toc-text">电商系统运费计算模块设计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总体需求说明"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">总体需求说明</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#设计需求与约束说明"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">设计需求与约束说明</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#表结构设计"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">表结构设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#运费计算方法设计"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">运费计算方法设计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#单商品运费计算方式"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">单商品运费计算方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#多商品（购物车）运费计算方式"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">多商品（购物车）运费计算方式</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#喵书商城表结构待改造部分"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">喵书商城表结构待改造部分</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#订单表"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">订单表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#关于网站自营与商家店铺的区分"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">关于网站自营与商家店铺的区分</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考文献"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">参考文献</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-design/电商系统运费计算模块设计" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">电商系统运费计算模块设计</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-15T03:17:45.000Z" itemprop="datePublished" class="post-time">
+  2016-11-15
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="电商系统运费计算模块设计"><a href="#电商系统运费计算模块设计" class="headerlink" title="电商系统运费计算模块设计"></a>电商系统运费计算模块设计</h1><p>本文试图做一个模型设计上的思考试验，试图在需求没有细化、很有可能需要变更的情况下，做一个高度弹性、能充分应对需求变更的数据结构设计。</p>
+<p>而电商系统的运费计算模板设计，是一个很常见的功能，虽然每个系统可能有一些定制化的要求，但总体的方式应该是在一定范围内的，主要参考淘宝、京东（有自营店）的常见方式。</p>
+<p>所以以此做一个数据结构设计训练的发端与范例。</p>
+<h2 id="总体需求说明"><a href="#总体需求说明" class="headerlink" title="总体需求说明"></a>总体需求说明</h2><p>系统能够根据客户选择的运送方式快递类型，以及用户所在的地区自动计算运费</p>
+<h2 id="设计需求与约束说明"><a href="#设计需求与约束说明" class="headerlink" title="设计需求与约束说明"></a>设计需求与约束说明</h2><ol>
+<li>模板需要支持包邮与不包邮</li>
+<li>计费方式需要支持固定邮费、按件、按重量、按体积，并且需要支持2段计费，如10kg以内10元，每增加1kg加0.5元</li>
+<li>支持用户选择不同的快递类型，但计费方式与运送区域可由商家配置</li>
+<li>支持条件包邮，条件包括订单满一定金额（考虑跨店订单不能累加）、处于一定区域、商品数量在一定范围内，条件可并列，且支持多个条件（可支持and/or）</li>
+<li>分区域计费的粒度暂时定为省级别，且可以直接设置全国默认</li>
+</ol>
+<h2 id="表结构设计"><a href="#表结构设计" class="headerlink" title="表结构设计"></a>表结构设计</h2><p>从上述需求可以看到有三个对象：整体计费模板、包邮条件、计费方式</p>
+<p>初步表设计如下：</p>
+<hr>
+<p>运费计算规则-FreightRule</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>数据类型</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>规则名称-name</td>
+<td>string</td>
+<td>-</td>
+</tr>
+<tr>
+<td>是否包邮-free</td>
+<td>boolean</td>
+<td>不包邮规则必须绑定计费方式</td>
+</tr>
+<tr>
+<td>是否条件包邮-freeConditional</td>
+<td>boolean</td>
+<td>选择条件包邮的规则必须绑定包邮条件数据</td>
+</tr>
+<tr>
+<td>计费方式-chargeMode</td>
+<td>enum</td>
+<td>固定、按件、按重量、按体积</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>包邮条件-FreightFreeCondition</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>数据类型</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>运费规则外键-FreightRuleId</td>
+<td>foreign key</td>
+<td>-</td>
+</tr>
+<tr>
+<td>包邮地区-regions</td>
+<td>string</td>
+<td>将地区名或id用连字符连接，留空表示全国</td>
+</tr>
+<tr>
+<td>包邮件数-minPiece</td>
+<td>int</td>
+<td>超过此件数包邮</td>
+</tr>
+<tr>
+<td>包邮重量-minWeight</td>
+<td>int</td>
+<td>超过此重量包邮</td>
+</tr>
+<tr>
+<td>包邮体积-minVolume</td>
+<td>int</td>
+<td>超过此体积包邮</td>
+</tr>
+<tr>
+<td>包邮金额-minAmount</td>
+<td>int</td>
+<td>超过此金额包邮</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>运费计算方式-FreightChargeMode</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>数据类型</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>运费规则外键-FreightRuleId</td>
+<td>foreign key</td>
+<td>-</td>
+</tr>
+<tr>
+<td>适用地区-regions</td>
+<td>string</td>
+<td>将地区名或id用连字符连接，留空表示全国</td>
+</tr>
+<tr>
+<td>是否默认-default</td>
+<td>boolean</td>
+<td>如果地区匹配失败，那么选中此条</td>
+</tr>
+<tr>
+<td>快递公司-expressType</td>
+<td>enum</td>
+<td>-</td>
+</tr>
+<tr>
+<td>固定邮费-fixedPrice</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>首件数量-firstPiece</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>首重数量-firstWeight</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>首体积-firstVolume</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>首段费用-firstPrice</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>续件数量-secondPiece</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>续重数量-secondWeight</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>续体积-secondVolume</td>
+<td>int</td>
+<td>-</td>
+</tr>
+<tr>
+<td>续段费用-secondPrice</td>
+<td>int</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h2 id="运费计算方法设计"><a href="#运费计算方法设计" class="headerlink" title="运费计算方法设计"></a>运费计算方法设计</h2><h3 id="单商品运费计算方式"><a href="#单商品运费计算方式" class="headerlink" title="单商品运费计算方式"></a>单商品运费计算方式</h3><ol>
+<li>判断是否包邮</li>
+<li>判断是否满足条件包邮的条件</li>
+<li>根据客户选择的运送方式、所在地区查询计费方式</li>
+<li>计算运费</li>
+</ol>
+<h3 id="多商品（购物车）运费计算方式"><a href="#多商品（购物车）运费计算方式" class="headerlink" title="多商品（购物车）运费计算方式"></a>多商品（购物车）运费计算方式</h3><ol>
+<li>如果多商品全部属于同一种计费方式，那么计算出最大首费+最小续费</li>
+<li>如果多商品不属于同一种计费方式，<strong>此处将成为业务设定的难点，也从没在各大电商网站看到解决此问题的好方案</strong>，可选方案：<ul>
+<li>将相同计费方式合算，最后累加不同计费方式（背后的逻辑是，相同的计费方式的商品会在同一个快递，不同的计费方式会在不同的快递）</li>
+<li>全部累加（背后的逻辑是，即使是相同的计费方式，也不一定或者不会发一份快递，比如同样按重量计费的大米与木地板，不会放在同一个包裹）</li>
+</ul>
+</li>
+</ol>
+<h2 id="喵书商城表结构待改造部分"><a href="#喵书商城表结构待改造部分" class="headerlink" title="喵书商城表结构待改造部分"></a>喵书商城表结构待改造部分</h2><h3 id="订单表"><a href="#订单表" class="headerlink" title="订单表"></a>订单表</h3><p>订单表需要添加字段标识用户选择的运送方式，增加字段保存运费值，将商品金额转移到订单行表上，并且记录原价与实际支付价格。</p>
+<h3 id="关于网站自营与商家店铺的区分"><a href="#关于网站自营与商家店铺的区分" class="headerlink" title="关于网站自营与商家店铺的区分"></a>关于网站自营与商家店铺的区分</h3><p>由于商家店铺与网站自营的商品不可能放在同一份快递，所以必须拆订单，分别计算运费。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://www.cnblogs.com/lintao0823/p/4230425.html" target="_blank" rel="noopener">http://www.cnblogs.com/lintao0823/p/4230425.html</a></p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/design/电商系统运费计算模块设计/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/design/电商系统运费计算模块设计/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/数据结构设计/">数据结构设计</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/14Server和Service/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Server和Service</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/13Host和Engine/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Host和Engine</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "电商系统运费计算模块设计",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/design/电商系统运费计算模块设计/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

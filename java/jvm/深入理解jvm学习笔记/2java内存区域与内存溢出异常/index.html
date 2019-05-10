@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>java内存区域与内存溢出异常 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,读书笔记,jvm">
+  <meta name="description" content="java内存区域与内存溢出异常运行时数据区域 程序计数器(Program Counter Register)   字节码行号指示器，用来控制指令的前进：如分支、循环、跳转、异常处理、线程恢复等。  java虚拟机栈(Java Virtual Machine Stacks)  通常所说的栈内存。 在方法执行时创建栈帧，保存了局部变量表、操作数栈、动态链接、方法出口等信息。 其中局部变量表存放了编译期">
+<meta name="keywords" content="java,读书笔记,jvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java内存区域与内存溢出异常">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="java内存区域与内存溢出异常运行时数据区域 程序计数器(Program Counter Register)   字节码行号指示器，用来控制指令的前进：如分支、循环、跳转、异常处理、线程恢复等。  java虚拟机栈(Java Virtual Machine Stacks)  通常所说的栈内存。 在方法执行时创建栈帧，保存了局部变量表、操作数栈、动态链接、方法出口等信息。 其中局部变量表存放了编译期">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.856Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java内存区域与内存溢出异常">
+<meta name="twitter:description" content="java内存区域与内存溢出异常运行时数据区域 程序计数器(Program Counter Register)   字节码行号指示器，用来控制指令的前进：如分支、循环、跳转、异常处理、线程恢复等。  java虚拟机栈(Java Virtual Machine Stacks)  通常所说的栈内存。 在方法执行时创建栈帧，保存了局部变量表、操作数栈、动态链接、方法出口等信息。 其中局部变量表存放了编译期">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java内存区域与内存溢出异常</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">java内存区域与内存溢出异常</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#java内存区域与内存溢出异常"><span class="post-toc-number">1.</span> <span class="post-toc-text">java内存区域与内存溢出异常</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#运行时数据区域"><span class="post-toc-number">1.0.1.</span> <span class="post-toc-text">运行时数据区域</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#HotSpot虚拟机"><span class="post-toc-number">1.0.2.</span> <span class="post-toc-text">HotSpot虚拟机</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OutOfMemoryError异常"><span class="post-toc-number">1.0.3.</span> <span class="post-toc-text">OutOfMemoryError异常</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java内存区域与内存溢出异常</h1>
+        <div class="post-meta">
+            <time datetime="2016-10-02T01:16:24.000Z" itemprop="datePublished" class="post-time">
+  2016-10-02
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="java内存区域与内存溢出异常"><a href="#java内存区域与内存溢出异常" class="headerlink" title="java内存区域与内存溢出异常"></a>java内存区域与内存溢出异常</h1><h3 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h3><ul>
+<li><p>程序计数器(Program Counter Register)</p>
+<p>  字节码行号指示器，用来控制指令的前进：如分支、循环、跳转、异常处理、线程恢复等。</p>
+</li>
+<li><p>java虚拟机栈(Java Virtual Machine Stacks)</p>
+<ul>
+<li>通常所说的栈内存。</li>
+<li>在方法执行时创建栈帧，保存了局部变量表、操作数栈、动态链接、方法出口等信息。</li>
+<li>其中局部变量表存放了编译期可知的各种基本数据类型（8大基本类型）、对象引用以及returnAddress类型</li>
+<li>局部变量表空间相对确定，可在编译期完成分配，运行期间不会改变局部变量表的大小。</li>
+<li>此区域主要会导致STackOverflow-栈深度超出jvm允许深度异常、OutOfMemoryError异常。</li>
+</ul>
+</li>
+<li><p>本地方法栈(Native Method Stack)</p>
+<p>  主要供native方法使用</p>
+</li>
+<li><p>java堆(Java Heap)</p>
+<ul>
+<li>存放对象实例</li>
+<li>Xms与Xmx表示其最小-最大分配内存</li>
+</ul>
+</li>
+<li><p>方法区(Method Area)</p>
+<ul>
+<li>主要存储：<ul>
+<li>类信息</li>
+<li>常量</li>
+<li>静态变量</li>
+<li>即时编译器编译后的代码</li>
+</ul>
+</li>
+<li>常被称之为永久代，jvm规范未对这个区域的回收做强制规定</li>
+</ul>
+</li>
+<li><p>运行时常量池(Runtime Constants Pool)</p>
+<ul>
+<li>是方法区的一部分</li>
+<li>除了编译期的字面量与符号引用，运行期新的常量也能加入池中</li>
+</ul>
+</li>
+<li><p>直接内存(Direct Memory)</p>
+<ul>
+<li>不是jvm运行时数据区</li>
+</ul>
+</li>
+<li><p>线程</p>
+<ul>
+<li>线程共享：方法区、堆</li>
+<li>线程隔离：虚拟机栈、本地方法栈、程序计数器</li>
+</ul>
+</li>
+</ul>
+<h3 id="HotSpot虚拟机"><a href="#HotSpot虚拟机" class="headerlink" title="HotSpot虚拟机"></a>HotSpot虚拟机</h3><ol>
+<li><p>对象的创建</p>
+<ol>
+<li>检查类是否已加载</li>
+<li>为新生对象分配内存<ul>
+<li>指针碰撞：内存是规整的，通过移动指针分界点来分配内存</li>
+<li>空闲列表：内存不是规整的</li>
+<li>采用哪种分配方式最终是根据垃圾收集器是否带有压缩整理功能导致java堆是否规整决定的</li>
+</ul>
+</li>
+<li>线程安全<ul>
+<li>线程同步处理</li>
+<li>本地线程分配缓冲(Thread Local Allocation Buffer, TLAB)</li>
+</ul>
+</li>
+<li>初始化零值</li>
+<li>设置对象头 </li>
+<li>执行构造器方法<init></init></li>
+</ol>
+</li>
+<li><p>对象的内存布局</p>
+<ul>
+<li>对象头(Header)<ul>
+<li>对象是哪个类的实例</li>
+<li>类的元数据信息</li>
+<li>哈希码</li>
+<li>gc分代</li>
+<li>锁状态标志</li>
+<li>线程持有的锁</li>
+<li>偏向线程ID</li>
+<li>偏向时间戳</li>
+</ul>
+</li>
+<li>实例数据(Instance Data)</li>
+<li>对齐填充(Padding)</li>
+</ul>
+</li>
+<li><p>对象的访问定位</p>
+<ul>
+<li><p>句柄访问</p>
+<p>  句柄：可简单理解为智能指针，由操作系统所管理的引用标识，封装了操作范围内的服务。</p>
+<p>  最大的优势在于，reference中存储的是稳定的句柄地址而不是指针地址，所以当对象的物理位置被移动时，reference数据无需任何修改，而在GC过程中，对象的移动十分普遍。</p>
+</li>
+<li><p>直接指针访问</p>
+<p>  优势：节省指针定位的开销，速度更快。<br>  HotSpot虚拟机是采用此访问定位方式。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="OutOfMemoryError异常"><a href="#OutOfMemoryError异常" class="headerlink" title="OutOfMemoryError异常"></a>OutOfMemoryError异常</h3><ul>
+<li><p>java堆溢出</p>
+<p>  java.lang.OutOfMemoryError: Java heap space</p>
+<p>  演示范例： 向ArrayList死循环添加对象</p>
+</li>
+<li><p>栈溢出</p>
+<ul>
+<li>如果线程请求的栈深度大于虚拟机所允许的最大深度，将抛出StackOverflowError异常</li>
+<li><p>如果虚拟机在拓展栈时无法申请到足够的内存空间，将抛出OutOfMemoryError异常</p>
+<p>演示范例： 死递归</p>
+</li>
+</ul>
+</li>
+<li><p>方法区和运行时常量池溢出</p>
+<p>  java.lang.OutOfMemoryError: PermGen space</p>
+<p>  演示范例： </p>
+<ul>
+<li>使用String.intern()将字符串纳入运行时常量池，无限循环导致溢出</li>
+<li><p>使用CGLib字节码技术动态生成Class并装载至内存，最终造成方法区溢出</p>
+<p>方法区溢出其实十分常见：CGLib(常见的spring aop)、jsp应用、OSGi应用等。</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/jvm/">jvm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/点赞设计/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">点赞设计</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/lebooks/瞄星架构设计说明/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">瞄星架构设计说明</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "java内存区域与内存溢出异常",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/jvm/深入理解jvm学习笔记/2java内存区域与内存溢出异常/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

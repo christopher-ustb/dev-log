@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>诗歌社区架构设计 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="lebooks-private">
+  <meta name="description" content="诗歌社区架构设计基础架构沿用喵书的用maven管理的垂直水平相结合的分层架构rest-api后端数据接口+angular-SPA前端应用。 在此基础上，分为以下服务器。  应用服务器承载了主要的业务逻辑，使用Mysql、Redis作为持久层。 鉴权模块提供身份验证相关的所有服务：  创建token 删除token 通过token查询用户及权限，用户可能包括网站用户与管理员  将根据token验证身">
+<meta name="keywords" content="lebooks-private">
+<meta property="og:type" content="article">
+<meta property="og:title" content="诗歌社区架构设计">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/lebooks/诗歌社区架构设计/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="诗歌社区架构设计基础架构沿用喵书的用maven管理的垂直水平相结合的分层架构rest-api后端数据接口+angular-SPA前端应用。 在此基础上，分为以下服务器。  应用服务器承载了主要的业务逻辑，使用Mysql、Redis作为持久层。 鉴权模块提供身份验证相关的所有服务：  创建token 删除token 通过token查询用户及权限，用户可能包括网站用户与管理员  将根据token验证身">
+<meta property="og:image" content="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E8%AF%97%E6%AD%8C%E7%A4%BE%E5%8C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9E%B6%E6%9E%84.png">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="诗歌社区架构设计">
+<meta name="twitter:description" content="诗歌社区架构设计基础架构沿用喵书的用maven管理的垂直水平相结合的分层架构rest-api后端数据接口+angular-SPA前端应用。 在此基础上，分为以下服务器。  应用服务器承载了主要的业务逻辑，使用Mysql、Redis作为持久层。 鉴权模块提供身份验证相关的所有服务：  创建token 删除token 通过token查询用户及权限，用户可能包括网站用户与管理员  将根据token验证身">
+<meta name="twitter:image" content="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E8%AF%97%E6%AD%8C%E7%A4%BE%E5%8C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9E%B6%E6%9E%84.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">诗歌社区架构设计</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">诗歌社区架构设计</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#诗歌社区架构设计"><span class="post-toc-number">1.</span> <span class="post-toc-text">诗歌社区架构设计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#应用服务器"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">应用服务器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#鉴权模块"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">鉴权模块</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#用户消息服务器"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">用户消息服务器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#技术选型"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">技术选型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#需求"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">需求</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MySQL数据库"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">MySQL数据库</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Redis数据库"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">Redis数据库</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ActiveMQ异步消息队列服务器"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">ActiveMQ异步消息队列服务器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#目的"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">目的</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#应用场景"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">应用场景</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Spring整合JMS"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text">Spring整合JMS</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#静态文件服务器"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">静态文件服务器</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-lebooks/诗歌社区架构设计" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">诗歌社区架构设计</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-17T02:29:07.000Z" itemprop="datePublished" class="post-time">
+  2016-11-17
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="诗歌社区架构设计"><a href="#诗歌社区架构设计" class="headerlink" title="诗歌社区架构设计"></a>诗歌社区架构设计</h1><p>基础架构沿用喵书的用maven管理的垂直水平相结合的分层架构rest-api后端数据接口+angular-SPA前端应用。</p>
+<p>在此基础上，分为以下服务器。</p>
+<p><img src="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E8%AF%97%E6%AD%8C%E7%A4%BE%E5%8C%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9E%B6%E6%9E%84.png" alt="诗歌社区服务器架构"></p>
+<h2 id="应用服务器"><a href="#应用服务器" class="headerlink" title="应用服务器"></a>应用服务器</h2><p>承载了主要的业务逻辑，使用Mysql、Redis作为持久层。</p>
+<h3 id="鉴权模块"><a href="#鉴权模块" class="headerlink" title="鉴权模块"></a>鉴权模块</h3><p>提供身份验证相关的所有服务：</p>
+<ul>
+<li>创建token</li>
+<li>删除token</li>
+<li>通过token查询用户及权限，用户可能包括网站用户与管理员</li>
+</ul>
+<p>将根据token验证身份的暴露为rest api供其他服务器使用。</p>
+<p>从MySQL中查询用户及权限信息</p>
+<p>利用Redis保存token，设置失效时间，将token值作为key以最快查询</p>
+<h2 id="用户消息服务器"><a href="#用户消息服务器" class="headerlink" title="用户消息服务器"></a>用户消息服务器</h2><h3 id="技术选型"><a href="#技术选型" class="headerlink" title="技术选型"></a>技术选型</h3><ul>
+<li>nodejs框架socket.io提供websocket服务</li>
+<li>redis作为消息数据源</li>
+<li>request作为http-client与鉴权服务器通信</li>
+</ul>
+<h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><ul>
+<li>提供websocket服务接口<code>ws://www.spoem.me/message/live</code>，连接成功后，服务端循环查询redis，一旦出现未处理消息就推送给客户端</li>
+<li>所有用户相关接口必须访问鉴权服务器进行身份验证，验证失败则断开连接</li>
+</ul>
+<h2 id="MySQL数据库"><a href="#MySQL数据库" class="headerlink" title="MySQL数据库"></a>MySQL数据库</h2><p>保存业务数据。</p>
+<p>应用服务器、鉴权服务器访问同一个schema，否则会出现犁书项目两个schema之间userid不一致的错误。</p>
+<p>可以考虑使用不同的MySQL用户来限制鉴权服务器对数据库的读写操作。</p>
+<h2 id="Redis数据库"><a href="#Redis数据库" class="headerlink" title="Redis数据库"></a>Redis数据库</h2><p>保存一些缓存性质的数据，如token、手机验证码等。</p>
+<p>持久化消息数据，转移消息服务器循环查询消息数据对MySQL的负担，使用前缀+用户名+topic+status作为key来优化查询效率。</p>
+<h2 id="ActiveMQ异步消息队列服务器"><a href="#ActiveMQ异步消息队列服务器" class="headerlink" title="ActiveMQ异步消息队列服务器"></a>ActiveMQ异步消息队列服务器</h2><h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><ul>
+<li>异步处理业务，加快响应速度，提高吞吐量</li>
+<li>消息队列提高访问峰值承载能力</li>
+<li>代码解耦，在不是紧耦合的模块之间传递消息来处理支线流程</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li>异步化用户点赞、用户阅读时创建数据的流程</li>
+<li>发送短信验证码</li>
+<li>其他松耦合、异步处理流程</li>
+</ul>
+<h3 id="Spring整合JMS"><a href="#Spring整合JMS" class="headerlink" title="Spring整合JMS"></a>Spring整合JMS</h3><p><a href="http://elim.iteye.com/blog/1893038" target="_blank" rel="noopener">http://elim.iteye.com/blog/1893038</a></p>
+<p><a href="http://www.cnblogs.com/luochengqiuse/p/4685347.html" target="_blank" rel="noopener">http://www.cnblogs.com/luochengqiuse/p/4685347.html</a></p>
+<h2 id="静态文件服务器"><a href="#静态文件服务器" class="headerlink" title="静态文件服务器"></a>静态文件服务器</h2><p>nginx提供html/css/js/media file的静态服务。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/lebooks/诗歌社区架构设计/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/lebooks/诗歌社区架构设计/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/lebooks-private/">lebooks-private</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/design/基于angular与nginx的SPA的SEO方案/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">基于angular与nginx的SPA的SEO方案</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/lebooks/诗歌社区模块设计/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">诗歌社区模块设计</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "诗歌社区架构设计",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/lebooks/诗歌社区架构设计/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

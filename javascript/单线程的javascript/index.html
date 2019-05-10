@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>单线程的javascript | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="Javascript,多线程">
+  <meta name="description" content="单线程的javascript一个有趣的死循环bug在略去这个bug所有的外围细节后，我试图还原一个最小化的场景： 现在需要使用js将一个图片列表依次动态添加到页面上，但是有一个限定条件，在前一张图片没有加载完成之前，后一张图片不得抢先加载，必须等待前一张load事件触发。 这有何难： 1234567891011121314// 引入jQuery// imgs 是图片数组for (var i = 0">
+<meta name="keywords" content="Javascript,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单线程的javascript">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/javascript/单线程的javascript/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="单线程的javascript一个有趣的死循环bug在略去这个bug所有的外围细节后，我试图还原一个最小化的场景： 现在需要使用js将一个图片列表依次动态添加到页面上，但是有一个限定条件，在前一张图片没有加载完成之前，后一张图片不得抢先加载，必须等待前一张load事件触发。 这有何难： 1234567891011121314// 引入jQuery// imgs 是图片数组for (var i = 0">
+<meta property="og:image" content="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E5%A4%9A%E7%BA%BF%E7%A8%8Bjavascript%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="http://image.beekka.com/blog/2014/bg2014100801.jpg">
+<meta property="og:image" content="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E5%8D%95%E7%BA%BF%E7%A8%8Bjavascript%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.872Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="单线程的javascript">
+<meta name="twitter:description" content="单线程的javascript一个有趣的死循环bug在略去这个bug所有的外围细节后，我试图还原一个最小化的场景： 现在需要使用js将一个图片列表依次动态添加到页面上，但是有一个限定条件，在前一张图片没有加载完成之前，后一张图片不得抢先加载，必须等待前一张load事件触发。 这有何难： 1234567891011121314// 引入jQuery// imgs 是图片数组for (var i = 0">
+<meta name="twitter:image" content="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E5%A4%9A%E7%BA%BF%E7%A8%8Bjavascript%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">单线程的javascript</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">单线程的javascript</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#单线程的javascript"><span class="post-toc-number">1.</span> <span class="post-toc-text">单线程的javascript</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一个有趣的死循环bug"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">一个有趣的死循环bug</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#javascript为什么是单线程的"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">javascript为什么是单线程的</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#任务队列"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">任务队列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#利用事件机制实现异步编程"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">利用事件机制实现异步编程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#与多线程实现方式的对比"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">与多线程实现方式的对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#致歉"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">致歉</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考文献"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">参考文献</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-javascript/单线程的javascript" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">单线程的javascript</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-30T06:51:49.000Z" itemprop="datePublished" class="post-time">
+  2016-11-30
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Javascript/">Javascript</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="单线程的javascript"><a href="#单线程的javascript" class="headerlink" title="单线程的javascript"></a>单线程的javascript</h1><h2 id="一个有趣的死循环bug"><a href="#一个有趣的死循环bug" class="headerlink" title="一个有趣的死循环bug"></a>一个有趣的死循环bug</h2><p>在略去这个bug所有的外围细节后，我试图还原一个最小化的场景：</p>
+<p>现在需要使用js将一个图片列表依次动态添加到页面上，但是有一个限定条件，在前一张图片没有加载完成之前，后一张图片不得抢先加载，必须等待前一张load事件触发。</p>
+<p>这有何难：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 引入jQuery</span></span><br><span class="line"><span class="comment">// imgs 是图片数组</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = imgs.length; i &lt; len; i ++)&#123;</span><br><span class="line">    <span class="keyword">var</span> img = imgs[i];</span><br><span class="line">    $(<span class="built_in">document</span>.body).append(img);</span><br><span class="line">    <span class="keyword">var</span> imgLoadSuccess = <span class="literal">false</span>;</span><br><span class="line">    img.on(<span class="string">'load'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      imgLoadSuccess = <span class="literal">true</span>;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'img '</span> + img.attr(<span class="string">'src'</span>) + <span class="string">' load success.ready to load the next one.'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">while</span>(!imgLoadSuccess) &#123;</span><br><span class="line">        <span class="comment">// wait until im load success</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从一个java开发者看来，这里的流程是这样的：</p>
+<p><img src="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E5%A4%9A%E7%BA%BF%E7%A8%8Bjavascript%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="多线程的javascript流程图"></p>
+<p>然而结果是，浏览器的javascript进入了一个可耻的死循环，并且图片也没有添加成功，load事件的回调方法也从来没有执行过。</p>
+<h2 id="javascript为什么是单线程的"><a href="#javascript为什么是单线程的" class="headerlink" title="javascript为什么是单线程的"></a>javascript为什么是单线程的</h2><p>很多javascript开发者在接触js的第一天就会看到一句话：JavaScript是单线程运行的。</p>
+<p>结合javascript语言作为浏览器脚本语言的最初用途，其实这个设定还是比较容易被接受的：<br>作为浏览器脚本语言，javascript的主要用途，就是与用户互动以及操作DOM元素，很明显如果多线程操作dom元素，将会大大提高问题的复杂度。</p>
+<p>所以javascript在设计之初就定下了<strong>单线程</strong>这个核心特征。</p>
+<p>随着js应用开发经验的日渐丰富，甚至promise编程的熟悉，这句话令一个java开发者更加百思不得其解，这么多的事件回调、ajax异步请求、promise编程，<br>都是在做异步编程的事情，明明是在<strong>并发</strong>，为什么说javascript是单线程运行呢？</p>
+<h2 id="任务队列"><a href="#任务队列" class="headerlink" title="任务队列"></a>任务队列</h2><p>javascript语言的单线程特性，就意味着所有的任务其需要排队。<br>那么各种各样的回调与异步编程是如何实现的呢？</p>
+<p>稍有js异步编程经验的开发者其实都知道，通常需要使用异步编程的场景，都是与IO操作有关。<br>由于IO操作的速度与cpu运算有数量级上的差距，所以将这些IO操作返回结果之后的任务都设置为异步任务。</p>
+<p>所以单线程js的异步运行机制如下：</p>
+<ol>
+<li>所有同步任务都在主线程上执行，形成了一个“执行栈”</li>
+<li>主线程之外，存在一个“任务队列”，只要异步任务返回了结果，就向“任务队列”中添加一个事件</li>
+<li>一旦“执行栈”中所有同步任务执行完毕，执行引擎就会去读取“任务队列”，将其队头的异步任务加入执行栈，开始执行</li>
+<li>主线程不停重复以上三步</li>
+</ol>
+<p><img src="http://image.beekka.com/blog/2014/bg2014100801.jpg" alt="单线程js的异步运行机制"></p>
+<p>所以，上面那个死循环的代码其实是这样运行的：</p>
+<p><img src="http://oh4zi4x28.bkt.clouddn.com//images/github-io/lebooks/%E5%8D%95%E7%BA%BF%E7%A8%8Bjavascript%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="单线程的javascript流程图"></p>
+<h2 id="利用事件机制实现异步编程"><a href="#利用事件机制实现异步编程" class="headerlink" title="利用事件机制实现异步编程"></a>利用事件机制实现异步编程</h2><p>俗话说，在什么山上唱什么歌。<br>在单线程、使用任务队列的javascript语境下，就不应该再使用多线程同步的思维，类似于java中Object#await()/notifyAll()方法来锁住/唤醒线程，<br>而应该也运用事件机制，将某些需要唤醒的进程任务，用事件来触发。</p>
+<p>为了不让数组中的图片在主线程中一次性全部添加进页面，将每个添加单张图片的行为封装成一个函数，并且利用图片加载事件来触发。<br>为了保存待添加图片的数组下标，必须将这个参数保存在函数之外的内存区域。</p>
+<p>重构后的伪代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> imgIndex = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">appendImg</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (imgIndex &gt;= imgs.length) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> img = imgs[imgIndex];</span><br><span class="line">    $(<span class="built_in">document</span>.body).append(img);</span><br><span class="line">    img.on(<span class="string">'load'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'img '</span> + img.attr(<span class="string">'src'</span>) + <span class="string">' load success.ready to load the next one.'</span>);</span><br><span class="line">        imgIndex ++;</span><br><span class="line">        appendImg();</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'img '</span> + img.attr(<span class="string">'src'</span>) + <span class="string">' append to document. wait util loaded.'</span>);</span><br><span class="line">&#125;</span><br><span class="line">appendImg();</span><br></pre></td></tr></table></figure></p>
+<h2 id="与多线程实现方式的对比"><a href="#与多线程实现方式的对比" class="headerlink" title="与多线程实现方式的对比"></a>与多线程实现方式的对比</h2><p>将之前运用多线程思维的bug版代码与重构后的代码对比，可以看出其中关键性的区别，在于保存了图片数组的当前被处理的元素下标。</p>
+<p>这个下标，其实相当于循环中的局部变量。<br>对应于多线程语言如Java在单CPU下的线程切换，其实这个下标就是方法执行的栈桢。<br>线程切换时，执行引擎必须将这个失去CPU的线程的栈桢保存起来，以便下次这个线程重新获得CPU时间的时候，能够把这个栈桢中的数据取出来，重新恢复上下文的执行环境。</p>
+<p>而这里的javascript单线程实现方式，也可以类比为：<br>添加图片元素的线程appendImg()方法，通过结束代码的方式放弃CPU使用权，将栈桢中的数据，也就是数据下标保存到不被GC的window对象中。<br>下次appendImg()方法重新被任务队列唤醒，获取到CPU时，可以直接从window对象中获取上下文环境，继续执行添加任务。</p>
+<p>某种程度上说，我这里是在用java的思想，实现本应由底层实现的线程调度。</p>
+<p>对于我需要实现的排版算法，基本思路已有蓝图，对于习惯了多线程的开发者来说，利用单线程的事件机制来实现异步编程主要要处理好三件事情：</p>
+<ul>
+<li><p>线程通过代码执行完毕来放弃CPU时间</p>
+<p>  在js中，是绝不会出现阻塞主线程的方式的，因为根本没有主线程，js只有一个线程。<br>  如果希望代码停止执行，那么必须让同步任务执行完毕。</p>
+</li>
+<li><p>线程通过注册事件来给自己定义下次获取CPU时间的时机</p>
+<p>  如果希望线程在某种情况下被唤醒，那么可以通过注册事件（定时器本质上也是一种事件：时间到了），将自己作为回调函数保存起来。</p>
+</li>
+<li><p>栈桢数据的保存与恢复</p>
+<p>  为了下次线程重新获取CPU时能够正常执行，必须将线程内部的局部变量情况–栈桢自行保存，下次再进行恢复。<br>  在本文的最小化demo中，只有一个循环的逻辑，所以栈桢结构非常简单，只是一个简单的数组下标。<br>  但是在真实的方法层层调用、各种逻辑分支的控制情况下，其实上下文执行环境的数据必然是一个先进后出的栈的结构，如何妥善地保存与恢复这些数据，可以参考jvm底层原理。</p>
+</li>
+</ul>
+<h2 id="致歉"><a href="#致歉" class="headerlink" title="致歉"></a>致歉</h2><p>本文完全从一个习惯了多线程运行的java开发者的视角去思考javascript异步机制，js原住民请忽略。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a href="http://www.ruanyifeng.com/blog/2014/10/event-loop.html" target="_blank" rel="noopener">JavaScript 运行机制详解：再谈Event Loop - 阮一峰网络日志</a></li>
+<li><a href="http://blog.sae.sina.com.cn/archives/2394" target="_blank" rel="noopener">深入理解JavaScript定时机制|Sina App Engine Blog</a></li>
+<li><a href="http://hao.jser.com/archive/9038/" target="_blank" rel="noopener">细说JavaScript单线程的一些事 — 好JSER</a></li>
+<li><a href="http://lujingbo.me/posts/the-javascript-event-loop-explained.html" target="_blank" rel="noopener">[译]解析JavaScript的事件循环机制</a></li>
+</ul>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/javascript/单线程的javascript/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/javascript/单线程的javascript/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Javascript/">Javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/lebooks/犁书重构规划/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">犁书重构规划</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/lebooks/利用浏览器优化排版算法的方案/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">利用浏览器优化排版算法的方案</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "单线程的javascript",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/javascript/单线程的javascript/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>servlet容器 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java,读书笔记,tomcat">
+  <meta name="description" content="servlet容器Container接口Catalina中的servlet容器，共有4种类型：  Engine： 表示整个Catalina servlet引擎 Host： 表示包含多个Context容器的虚拟主机 Context： 表示一个包含多个wrapper的web应用程序 Wrapper： 表示一个独立的servlet  可以看出，“容器”这个命名还是比较通俗的，因为每个容器都在盛装东西嘛。">
+<meta name="keywords" content="java,读书笔记,tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="servlet容器">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/5servlet容器/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="servlet容器Container接口Catalina中的servlet容器，共有4种类型：  Engine： 表示整个Catalina servlet引擎 Host： 表示包含多个Context容器的虚拟主机 Context： 表示一个包含多个wrapper的web应用程序 Wrapper： 表示一个独立的servlet  可以看出，“容器”这个命名还是比较通俗的，因为每个容器都在盛装东西嘛。">
+<meta property="og:updated_time" content="2018-01-13T07:15:27.868Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="servlet容器">
+<meta name="twitter:description" content="servlet容器Container接口Catalina中的servlet容器，共有4种类型：  Engine： 表示整个Catalina servlet引擎 Host： 表示包含多个Context容器的虚拟主机 Context： 表示一个包含多个wrapper的web应用程序 Wrapper： 表示一个独立的servlet  可以看出，“容器”这个命名还是比较通俗的，因为每个容器都在盛装东西嘛。">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">servlet容器</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">servlet容器</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#servlet容器"><span class="post-toc-number">1.</span> <span class="post-toc-text">servlet容器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Container接口"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Container接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#管道任务"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">管道任务</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Pipeline接口"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">Pipeline接口</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Valve接口"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">Valve接口</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ValveContext接口"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">ValveContext接口</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Contained接口"><span class="post-toc-number">1.2.4.</span> <span class="post-toc-text">Contained接口</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Wrapper"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Wrapper</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Context"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">Context</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/tomcat/深入剖析tomcat学习笔记/5servlet容器" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">servlet容器</h1>
+        <div class="post-meta">
+            <time datetime="2016-11-04T08:51:41.000Z" itemprop="datePublished" class="post-time">
+  2016-11-04
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="servlet容器"><a href="#servlet容器" class="headerlink" title="servlet容器"></a>servlet容器</h1><h2 id="Container接口"><a href="#Container接口" class="headerlink" title="Container接口"></a>Container接口</h2><p>Catalina中的servlet容器，共有4种类型：</p>
+<ul>
+<li>Engine： 表示整个Catalina servlet引擎</li>
+<li>Host： 表示包含多个Context容器的虚拟主机</li>
+<li>Context： 表示一个包含多个wrapper的web应用程序</li>
+<li>Wrapper： 表示一个独立的servlet</li>
+</ul>
+<p>可以看出，“容器”这个命名还是比较通俗的，因为每个容器都在盛装东西嘛。</p>
+<p>由于不同级别之间container是一种类似树形结构的关系，所以会有一些相关的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">Container[] findChildren();</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>容器的设计上会包含一些组件化的功能，所以也定义了一些属性，如：</p>
+<ul>
+<li>Loader： 加载容器中新的类的classloader</li>
+<li>Logger： 日志记录器</li>
+<li>Manager： session池管理器</li>
+<li>Realm： 只读的安全领域接口，做身份验证</li>
+<li>Resources： 静态资源访问器</li>
+</ul>
+<h2 id="管道任务"><a href="#管道任务" class="headerlink" title="管道任务"></a>管道任务</h2><p>管道包含了servlet容器所要调用的任务，一个阀表示一个具体的执行任务，阀都装在管道上。<br>这个模型的比喻其实相当好理解，也会让人不禁想到了责任链模式，让人不禁想到了servlet编程中的filterChain过滤器链。</p>
+<p>一个Pipeline有多个Valve，但是只有一个会被标记为BasicValve。</p>
+<p>tomcat的设计者没有使用一个循环遍历Valve数组的方式来执行任务，而是使用了一个ValveContext来实现责任链模式的遍历执行。</p>
+<h3 id="Pipeline接口"><a href="#Pipeline接口" class="headerlink" title="Pipeline接口"></a>Pipeline接口</h3><p>描述了一个应该顺序执行invoke()方法的Valve集合，通常每个容器都绑定一个Pipeline实例，并且容器的请求处理功能点是封装在管道内部的特定阀，通常将最基础的功能定义为Basic阀，在管道的最后执行。<br>其他的阀会按照它们被添加的顺序依次执行。<br>接口主要定义了增加减少阀、设置查找Basic阀以及invoke</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> </span>&#123;</span><br><span class="line">    <span class="function">Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    Valve[] getValves();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removeValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span><span class="keyword">throws</span> IOException, ServletException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Valve接口"><a href="#Valve接口" class="headerlink" title="Valve接口"></a>Valve接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response, ValveContext context)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ValveContext接口"><a href="#ValveContext接口" class="headerlink" title="ValveContext接口"></a>ValveContext接口</h3><p>描述了管道内一个阀能够触发下一个阀的执行的机制，而无需知道其内部的实现细节（上文所提到的循环遍历数据就是其中一种实现细节）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ValveContext</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">invokeNext</span><span class="params">(Request request, Response response)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Contained接口"><a href="#Contained接口" class="headerlink" title="Contained接口"></a>Contained接口</h3><p>一个解耦一个class必须绑定至多一个container实例的接口，描述这个类是带有容器的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">    <span class="function">Container <span class="title">getContainer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setContainer</span><span class="params">(Container container)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Wrapper"><a href="#Wrapper" class="headerlink" title="Wrapper"></a>Wrapper</h2><p>wrapper级别容器代表一个web应用部署后独立的servlet定义，并且其实现负责管理该servlet的生命周期。</p>
+<h2 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h2><p>大部分的web应用中，需要多个servlet合作，这时需要的servlet容器是Context，而不是Wrapper。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/5servlet容器/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/5servlet容器/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/6生命周期/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">生命周期</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/4tomcat的默认连接器/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">tomcat的默认连接器</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "servlet容器",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/tomcat/深入剖析tomcat学习笔记/5servlet容器/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
