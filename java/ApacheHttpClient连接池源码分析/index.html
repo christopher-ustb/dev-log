@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <title>ApacheHttpClient连接池源码分析 | Main.Weaver.Christopher.Diary | 魁主编的全栈训练营</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="Java,读源码">
+  <meta name="description" content="ApacheHttpClient连接池源码分析问题背景公司基于apache http client为核心，实现了一个类似于Zuul/nginx的网关系统。为了保护后端被转发的集群，必须具有限流特性，即并发量控制。我们知道apache http client自带了最大连接数的参数设置，在此细致解读一下其表现以及源码级别的实现方式。 连接池微观解读执行堆栈查看得出，核心的处理代码在：org.apach">
+<meta name="keywords" content="Java,读源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ApacheHttpClient连接池源码分析">
+<meta property="og:url" content="https://christopher-ustb.github.io/dev-log/java/ApacheHttpClient连接池源码分析/index.html">
+<meta property="og:site_name" content="Main.Weaver.Christopher.Diary">
+<meta property="og:description" content="ApacheHttpClient连接池源码分析问题背景公司基于apache http client为核心，实现了一个类似于Zuul/nginx的网关系统。为了保护后端被转发的集群，必须具有限流特性，即并发量控制。我们知道apache http client自带了最大连接数的参数设置，在此细致解读一下其表现以及源码级别的实现方式。 连接池微观解读执行堆栈查看得出，核心的处理代码在：org.apach">
+<meta property="og:updated_time" content="2019-05-23T09:09:59.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ApacheHttpClient连接池源码分析">
+<meta name="twitter:description" content="ApacheHttpClient连接池源码分析问题背景公司基于apache http client为核心，实现了一个类似于Zuul/nginx的网关系统。为了保护后端被转发的集群，必须具有限流特性，即并发量控制。我们知道apache http client自带了最大连接数的参数设置，在此细致解读一下其表现以及源码级别的实现方式。 连接池微观解读执行堆栈查看得出，核心的处理代码在：org.apach">
+  
+    <link rel="alternative" href="/atom.xml" title="Main.Weaver.Christopher.Diary" type="application/atom+xml">
+  
+  <meta name="summary" content="水货开发者的鱼塘遨游日志">
+  <link rel="shortcut icon" href="/dev-log/favicon.ico">
+  <link rel="stylesheet" href="/dev-log/css/style.css?v=1.1.7">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar"><img src="/dev-log/img/logo.jpg"></a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Christopher.Wang</h5>
+          <a href="mailto:wangchao_ustb_2012@163.com" title="wangchao_ustb_2012@163.com" class="mail">wangchao_ustb_2012@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                文章
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/christopher-ustb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/dev-log/thanks"  >
+                <i class="icon icon-lg icon-link"></i>
+                致谢
+              </a>
+            </li>
+        
+      </ul>
+
+      <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Main.Weaver.Christopher.Diary &copy; 2019</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+    </div>
+  </div>
+</aside>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ApacheHttpClient连接池源码分析</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container">
+        <h1 class="title">ApacheHttpClient连接池源码分析</h1>
+        
+        
+
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ApacheHttpClient连接池源码分析"><span class="post-toc-number">1.</span> <span class="post-toc-text">ApacheHttpClient连接池源码分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#问题背景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接池微观解读"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">连接池微观解读</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接池宏观设计"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">连接池宏观设计</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#‘池’"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">‘池’</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java/ApacheHttpClient连接池源码分析" 
+  class="post-article article-type-post" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ApacheHttpClient连接池源码分析</h1>
+        <div class="post-meta">
+            <time datetime="2019-05-23T03:14:00.000Z" itemprop="datePublished" class="post-time">
+  2019-05-23
+</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="ApacheHttpClient连接池源码分析"><a href="#ApacheHttpClient连接池源码分析" class="headerlink" title="ApacheHttpClient连接池源码分析"></a>ApacheHttpClient连接池源码分析</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>公司基于apache http client为核心，实现了一个类似于<a href="https://github.com/Netflix/zuul" target="_blank" rel="noopener">Zuul</a>/nginx的网关系统。<br>为了保护后端被转发的集群，必须具有限流特性，即并发量控制。<br>我们知道apache http client自带了最大连接数的参数设置，在此细致解读一下其表现以及源码级别的实现方式。</p>
+<h2 id="连接池微观解读"><a href="#连接池微观解读" class="headerlink" title="连接池微观解读"></a>连接池微观解读</h2><p>执行堆栈查看得出，核心的处理代码在：<code>org.apache.http.pool.AbstractConnPool</code>，<br>作为一个抽象同步阻塞连接池，实现了接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ConnPool</span>&lt;<span class="title">T</span>, <span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 租借连接</span></span><br><span class="line">    <span class="function">Future&lt;E&gt; <span class="title">lease</span><span class="params">(<span class="keyword">final</span> T route, <span class="keyword">final</span> Object state, <span class="keyword">final</span> FutureCallback&lt;E&gt; callback)</span></span>;</span><br><span class="line">    <span class="comment">// 释放连接</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">release</span><span class="params">(E entry, <span class="keyword">boolean</span> reusable)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先看一下，<code>org.apache.http.pool.AbstractConnPool</code>类有哪些主要的属性：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不同线程获取连接之间的竞态条件</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Condition condition;</span><br><span class="line"><span class="comment">// 连接工厂</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ConnFactory&lt;T, C&gt; connFactory;</span><br><span class="line"><span class="comment">// 保存route到连接池的map，apache http client可以设置参数setMaxConnPerRoute，按照route管理连接</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;T, RouteSpecificPool&lt;T, C, E&gt;&gt; routeToPool;</span><br><span class="line"><span class="comment">// 已租借出的连接</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Set&lt;E&gt; leased;</span><br><span class="line"><span class="comment">// 可用的连接</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> LinkedList&lt;E&gt; available;</span><br><span class="line"><span class="comment">// 等待中的连接future对象</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> LinkedList&lt;Future&lt;E&gt;&gt; pending;</span><br><span class="line"><span class="comment">// route到连接数的映射</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;T, Integer&gt; maxPerRoute;</span><br></pre></td></tr></table></figure>
+<p>再来看一下我们最关心的<code>lease</code>方法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Future&lt;E&gt; <span class="title">lease</span><span class="params">(<span class="keyword">final</span> T route, <span class="keyword">final</span> Object state, <span class="keyword">final</span> FutureCallback&lt;E&gt; callback)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Future&lt;E&gt;() &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicBoolean cancelled = <span class="keyword">new</span> AtomicBoolean(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicBoolean done = <span class="keyword">new</span> AtomicBoolean(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicReference&lt;E&gt; entryRef = <span class="keyword">new</span> AtomicReference&lt;E&gt;(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">cancel</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> mayInterruptIfRunning)</span> </span>&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> get(<span class="number">0L</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> TimeoutException ex) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ExecutionException(ex);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">final</span> <span class="keyword">long</span> timeout, <span class="keyword">final</span> TimeUnit timeUnit)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException </span>&#123;</span><br><span class="line">            <span class="keyword">final</span> E entry = entryRef.get();</span><br><span class="line">            <span class="keyword">if</span> (entry != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> entry;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                        <span class="comment">// 死循环一直借到连接为止，除非出现被打断的异常</span></span><br><span class="line">                        <span class="keyword">final</span> E leasedEntry = getPoolEntryBlocking(route, state, timeout, timeUnit, <span class="keyword">this</span>);</span><br><span class="line">                        ...</span><br><span class="line">                        entryRef.set(leasedEntry);</span><br><span class="line">                        done.set(<span class="keyword">true</span>);</span><br><span class="line">                        onLease(leasedEntry);</span><br><span class="line">                        <span class="keyword">if</span> (callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            callback.completed(leasedEntry);</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">return</span> leasedEntry;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> IOException ex) &#123;</span><br><span class="line">                    done.set(<span class="keyword">true</span>);</span><br><span class="line">                    <span class="keyword">if</span> (callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        callback.failed(ex);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> ExecutionException(ex);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，这个方法直接返回了一个与连接池关联的Future对象，所有的秘密都在这个匿名类中。<br>着重看一下<code>Future.get</code>:<br>除了处理一些前后回调钩子（onRelease/callback）外，主要将功能委托给了getPoolEntryBlocking方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> E <span class="title">getPoolEntryBlocking</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">final</span> T route, <span class="keyword">final</span> Object state,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">final</span> <span class="keyword">long</span> timeout, <span class="keyword">final</span> TimeUnit timeUnit,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">final</span> Future&lt;E&gt; future)</span> <span class="keyword">throws</span> IOException, InterruptedException, TimeoutException </span>&#123;</span><br><span class="line"></span><br><span class="line">    Date deadline = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (timeout &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        deadline = <span class="keyword">new</span> Date (System.currentTimeMillis() + timeUnit.toMillis(timeout));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> RouteSpecificPool&lt;T, C, E&gt; pool = getPool(route);</span><br><span class="line">        E entry;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> TimeoutException(<span class="string">"Timeout waiting for connection"</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对对象加锁之后，根据route来获取<code>RouteSpecificPool</code>对象，可以参考一下上文提到的属性 <code>routeToPool</code>。</p>
+<p>在这个for循环中，主要分为以下几段来获取连接：</p>
+<ol>
+<li><p>尝试获取空闲的连接，如果获取成功直接return。顺便关闭、清除了过期的连接。</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (;;) &#123;</span><br><span class="line">    entry = pool.getFree(state);</span><br><span class="line">    <span class="keyword">if</span> (entry == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (entry.isExpired(System.currentTimeMillis())) &#123;</span><br><span class="line">        entry.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (entry.isClosed()) &#123;</span><br><span class="line">        <span class="keyword">this</span>.available.remove(entry);</span><br><span class="line">        pool.free(entry, <span class="keyword">false</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (entry != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.available.remove(entry);</span><br><span class="line">    <span class="keyword">this</span>.leased.add(entry);</span><br><span class="line">    onReuse(entry);</span><br><span class="line">    <span class="keyword">return</span> entry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 关于<code>pool.getFree(state)</code>中的state：<br> 这是<code>ConnPool</code>接口中<code>lease</code>方法定义了的入参，可以传入任意一个Object对象，含义是用来表示一种特殊的状态（通常是安全秘钥、token等），来定位同样的连接。如果不需要这个支持，可以传null。</p>
+</li>
+<li><p>缩容超出maxPerRoute的连接池</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// New connection is needed</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> maxPerRoute = getMax(route);</span><br><span class="line"><span class="comment">// Shrink the pool prior to allocating a new connection</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> excess = Math.max(<span class="number">0</span>, pool.getAllocatedCount() + <span class="number">1</span> - maxPerRoute);</span><br><span class="line"><span class="keyword">if</span> (excess &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; excess; i++) &#123;</span><br><span class="line">        <span class="keyword">final</span> E lastUsed = pool.getLastUsed();</span><br><span class="line">        <span class="keyword">if</span> (lastUsed == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        lastUsed.close();</span><br><span class="line">        <span class="keyword">this</span>.available.remove(lastUsed);</span><br><span class="line">        pool.remove(lastUsed);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果还有空余容量，从工厂对象<code>connFactory</code>生产新的连接加入池。</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (pool.getAllocatedCount() &lt; maxPerRoute) &#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> totalUsed = <span class="keyword">this</span>.leased.size();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> freeCapacity = Math.max(<span class="keyword">this</span>.maxTotal - totalUsed, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (freeCapacity &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> totalAvailable = <span class="keyword">this</span>.available.size();</span><br><span class="line">        <span class="keyword">if</span> (totalAvailable &gt; freeCapacity - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.available.isEmpty()) &#123;</span><br><span class="line">                <span class="keyword">final</span> E lastUsed = <span class="keyword">this</span>.available.removeLast();</span><br><span class="line">                lastUsed.close();</span><br><span class="line">                <span class="keyword">final</span> RouteSpecificPool&lt;T, C, E&gt; otherpool = getPool(lastUsed.getRoute());</span><br><span class="line">                otherpool.remove(lastUsed);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">final</span> C conn = <span class="keyword">this</span>.connFactory.create(route);</span><br><span class="line">        entry = pool.add(conn);</span><br><span class="line">        <span class="keyword">this</span>.leased.add(entry);</span><br><span class="line">        <span class="keyword">return</span> entry;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>阻塞线程，等待空闲连接</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> success = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 如果Future已经取消，那么直接跳出等待，结束外层死循环</span></span><br><span class="line">    <span class="keyword">if</span> (future.isCancelled()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException(<span class="string">"Operation interrupted"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    pool.queue(future);</span><br><span class="line">    <span class="keyword">this</span>.pending.add(future);</span><br><span class="line">    <span class="comment">// 使用condition阻塞线程，等待condition.signalAll()</span></span><br><span class="line">    <span class="keyword">if</span> (deadline != <span class="keyword">null</span>) &#123;</span><br><span class="line">        success = <span class="keyword">this</span>.condition.awaitUntil(deadline);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.condition.await();</span><br><span class="line">        success = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (future.isCancelled()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException(<span class="string">"Operation interrupted"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// In case of 'success', we were woken up by the</span></span><br><span class="line">    <span class="comment">// connection pool and should now have a connection</span></span><br><span class="line">    <span class="comment">// waiting for us, or else we're shutting down.</span></span><br><span class="line">    <span class="comment">// Just continue in the loop, both cases are checked.</span></span><br><span class="line">    pool.unqueue(future);</span><br><span class="line">    <span class="keyword">this</span>.pending.remove(future);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 被唤醒的时机：</p>
+<ul>
+<li>其他Future被cancel，不跟你抢了</li>
+<li>其他线程release连接，归还了，但这也不表示能获取到连接，需要在<code>queue</code>排队</li>
+</ul>
+</li>
+<li><p>检验超时</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果未成功获取到对象，且等待超时，那么跳出循环，throw超时异常</span></span><br><span class="line"><span class="comment">// check for spurious wakeup vs. timeout</span></span><br><span class="line">    <span class="keyword">if</span> (!success &amp;&amp; (deadline != <span class="keyword">null</span> &amp;&amp; deadline.getTime() &lt;= System.currentTimeMillis())) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">throw</span> <span class="keyword">new</span> TimeoutException(<span class="string">"Timeout waiting for connection"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>看到这里，这个连接池的微观层面的代码实现已经基本剖析完毕，如果还有细节问题，可以再对照源码查看。</p>
+<p>这里比较巧妙地组合了Future/Lock/Condition/Queue（这里并没有使用并发集合类如<code>LinkedBlockingQueue</code>，而用LinkedList实现，猜测可能是历史遗留原因），实现了一个清晰安全的连接池，并且留下了许多可扩展可定制的参数与回调，值得学习参考。</p>
+<h2 id="连接池宏观设计"><a href="#连接池宏观设计" class="headerlink" title="连接池宏观设计"></a>连接池宏观设计</h2><p>上一部分从代码层面解读了连接池的微观实现，这里我们再宏观看一下，ApacheHttpClient如何使用这个连接池。</p>
+<p><code>org.apache.http.impl.conn.PoolingHttpClientConnectionManager</code>类维护了<code>org.apache.http.impl.conn.CPool</code>属性，该类是<code>AbstractConnPool</code>的实现类，基本功能都来自继承。</p>
+<p>ApacheHttpClient使用了责任链模式，链条上的executor：</p>
+<ol>
+<li><code>RedirectExec</code>: 负责处理重定向</li>
+<li><code>RetryExec</code>： 负责决定在io错误时是不是重试</li>
+<li><code>ServiceUnavailableRetryExec</code>： 负责决定非2xx响应是否重试</li>
+<li><code>ProtocolExec</code>： 负责处理http参数，构建请求体</li>
+<li><code>org.apache.http.impl.execchain.MainClientExec</code>：最后一个executor，负责实际的请求、响应转换，就是他从<code>PoolingHttpClientConnectionManager</code>中获取连接对象</li>
+</ol>
+<p>什么时候释放连接？</p>
+<ol>
+<li>流被关闭</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">streamClosed</span><span class="params">(<span class="keyword">final</span> InputStream wrapped)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        releaseManagedConnection();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>流检测读到eof</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">eofDetected</span><span class="params">(<span class="keyword">final</span> InputStream wrapped)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            releaseManagedConnection();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="‘池’"><a href="#‘池’" class="headerlink" title="‘池’"></a>‘池’</h2><p><em>池</em>是编程设计中非常常用的一种模式，能够高效地复用对象，网络连接这种初始化成本较高的对象的池化，是最典型的场景。<br>由于许多类库的支持，开发者可能很少需要去重复造轮子自己实现对象池，但深入理解池的实现，会让我们对一些常见的表现能够有更精确的把握，甚至针对一些定制化场景进行优化与修改，设计更强大更高级的池。</p>
+<p>ps： 文中httpcore版本 4.4.6，版本间细节差别应该不影响对设计的理解。</p>
+
+        </div>
+        
+        <blockquote class="post-copyright">
+            <div class="content">
+               原创作品，允许转载，转载时务必以链接形式标明文章出处、作者信息以及本声明，否则将追究法律责任。<a href="/dev-log/java/ApacheHttpClient连接池源码分析/" target="_blank" rel="external">https://christopher-ustb.github.io/dev-log/java/ApacheHttpClient连接池源码分析/</a>
+            </div>
+            <footer>
+                <a href="https://christopher-ustb.github.io/dev-log">
+                    <img src="/dev-log/img/logo.jpg" alt="Christopher.Wang">
+                    Christopher.Wang
+                </a>
+            </footer>
+        </blockquote>
+
+        
+        <div class="post-reward">
+            <a id="rewardBtn" href="javascript:;" class="post-reward-btn waves-effect waves-circle waves-light">赏</a>
+        </div>
+        
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读源码/">读源码</a></li></ul>
+
+
+            
+            <div class="post-share-wrap">
+                <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+                <a href="javascript:;" id="share-fab" class="post-share-fab waves-effect waves-circle">
+                    <i class="icon icon-share-alt icon-lg"></i>
+                </a>
+            </div>
+            
+
+        </div>
+    </div>   
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/dev-log/java/Java读取jar包中文件夹内容/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java读取jar包中文件夹内容</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+    
+
+
+
+</article>
+
+<div id="reward" class="reward-lay">
+    <a class="reward-off" id="rewardOff" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/dev-log/images/reward/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/dev-log/images/reward/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+</div>
+  </main>
+  <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>var BLOG = { ROOT: '/dev-log/' };
+BLOG.SHARE = {
+title: "ApacheHttpClient连接池源码分析",
+pic: "/dev-log/img/logo.jpg",
+summary: document.getElementsByName('summary')[0].content,
+url: "https://christopher-ustb.github.io/dev-log/java/ApacheHttpClient连接池源码分析/" }
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+  <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script src="/dev-log/js/main.min.js?v=1.1.7"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/dev-log/js/search.min.js?v=1.1.7"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -154,6 +154,72 @@
     <ul class="post-list">
     
         <li class="post-list-item">
+            <article id="post-lebooks/犁书重构规划"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2016-12-14T02:08:46.000Z" itemprop="datePublished" class="post-time">
+  2016-12-14
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/程序设计/">程序设计</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/lebooks/犁书重构规划/">犁书重构规划</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        犁书重构规划乐书网络内部开发分享，非相关人员忽略
+重构核心任务整合B端/C端服务相当于不同的产品：
+
+微信书、微博书、QQ书
+简书
+指南猫书
+诗歌书
+
+主要区别：
+
+数据来源
+排版方式
+支付、结算方式
+
+前后端分离jsp与SPA混合
+将用户页面与管理平台归并入两个webapp
+mock框架模拟未完成的rest api ：Swagger
+引入Maven，确定服务模块边界，规范模块化水平模块之间...
+    
+    
+        <a href="/dev-log/lebooks/犁书重构规划/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/lebooks-private/">lebooks-private</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/解耦/">解耦</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/重构/">重构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/面向对象/">面向对象</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
             <article id="post-javascript/单线程的javascript"
   class="article-card article-type-post" itemprop="blogPost">
      
@@ -637,59 +703,6 @@ StandardContext的配置StandardContext类的构造函数12345public StandardCon
     
     
         <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/12StandardContext/" class="post-more waves-effect waves-button">
-            阅读全文...
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item">
-            <article id="post-java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper"
-  class="article-card article-type-post" itemprop="blogPost">
-     
-    <div class="post-meta">
-        <time datetime="2016-11-10T02:09:28.000Z" itemprop="datePublished" class="post-time">
-  2016-11-10
-</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/">StandardWrapper</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent" >
-
-    
-        StandardWrapper方法调用序列对于每个引入的http请求，具体的方法调用过程如下：
-
-连接器(Connector)创建request/response对象
-连接器调用StandardContext实例的invoke()方法
-StandardContext实例invoke()方法调用其管道实例的invoke()方法，StandardContext中pipeline的基础阀是Stan...
-    
-    
-        <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/11StandardWrapper/" class="post-more waves-effect waves-button">
             阅读全文...
         </a>
     </div>

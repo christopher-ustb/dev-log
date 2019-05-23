@@ -154,6 +154,56 @@
     <ul class="post-list">
     
         <li class="post-list-item">
+            <article id="post-java/ApacheHttpClient连接池源码分析"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2019-05-23T03:14:00.000Z" itemprop="datePublished" class="post-time">
+  2019-05-23
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/ApacheHttpClient连接池源码分析/">ApacheHttpClient连接池源码分析</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        ApacheHttpClient连接池源码分析问题背景公司基于apache http client为核心，实现了一个类似于Zuul/nginx的网关系统。为了保护后端被转发的集群，必须具有限流特性，即并发量控制。我们知道apache http client自带了最大连接数的参数设置，在此细致解读一下其表现以及源码级别的实现方式。
+连接池微观解读执行堆栈查看得出，核心的处理代码在：org.ap...
+    
+    
+        <a href="/dev-log/java/ApacheHttpClient连接池源码分析/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读源码/">读源码</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
             <article id="post-java/Java读取jar包中文件夹内容"
   class="article-card article-type-post" itemprop="blogPost">
      
@@ -621,58 +671,6 @@ Executor...
     
     
         <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/6任务执行/" class="post-more waves-effect waves-button">
-            阅读全文...
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item">
-            <article id="post-java/concurrency/Java并发编程实战学习笔记/5基础构建模块"
-  class="article-card article-type-post" itemprop="blogPost">
-     
-    <div class="post-meta">
-        <time datetime="2017-08-02T16:00:00.000Z" itemprop="datePublished" class="post-time">
-  2017-08-03
-</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/">基础构建模块</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent" >
-
-    
-        基础构建模块Java平台类库包含了丰富的并发基础构建模块，例如线程安全的容器类以及同步工具类。
-同步容器类同步容器包括Vector、HashTable，Collections.synchronizedXxx等工厂方法创建的同步封装器类。
-这些类实现线程同步的方式是：将状态封装起来，并对每个公有方法同步，使得每次只有一个线程能访问容器的状态。
-同步容器类的问题复合操作，如：迭代、跳转、条件运算...
-    
-    
-        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/5基础构建模块/" class="post-more waves-effect waves-button">
             阅读全文...
         </a>
     </div>
