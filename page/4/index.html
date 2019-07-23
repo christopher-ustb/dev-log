@@ -154,6 +154,62 @@
     <ul class="post-list">
     
         <li class="post-list-item">
+            <article id="post-java/tomcat/深入剖析tomcat学习笔记/13Host和Engine"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2016-11-14T09:26:48.000Z" itemprop="datePublished" class="post-time">
+  2016-11-14
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/13Host和Engine/">Host和Engine</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        Host和EngineHost接口Host代表了Catalina servlet引擎中的一个虚拟主机。
+主要用于以下场景：
+
+为指定虚拟主机的每个请求使用拦截器
+需要将Catalina与一个独立的http连接器配合使用，但是仍然支持多虚拟主机
+
+StandardHost类StandardHost类是Catalina中Host接口的标准实现。
+StandardHost类的构造器与Standar...
+    
+    
+        <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/13Host和Engine/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
             <article id="post-java/tomcat/深入剖析tomcat学习笔记/12StandardContext"
   class="article-card article-type-post" itemprop="blogPost">
      
@@ -604,57 +660,6 @@ Con...
     
     
         <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/4tomcat的默认连接器/" class="post-more waves-effect waves-button">
-            阅读全文...
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/tomcat/">tomcat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item">
-            <article id="post-java/tomcat/深入剖析tomcat学习笔记/3连接器"
-  class="article-card article-type-post" itemprop="blogPost">
-     
-    <div class="post-meta">
-        <time datetime="2016-11-03T08:24:14.000Z" itemprop="datePublished" class="post-time">
-  2016-11-03
-</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/3连接器/">连接器</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent" >
-
-    
-        连接器本章主要构建一个tomcat4中默认连接器的简化版。主要演示了一下如何去解析http的内容。
-StringManager类一个基于properties文件、支持国际化的单例模式的字符串信息管理器。
-应用程序HttpConnector类123456789101112131415public class HttpConnector implements Runnable &#123;  p...
-    
-    
-        <a href="/dev-log/java/tomcat/深入剖析tomcat学习笔记/3连接器/" class="post-more waves-effect waves-button">
             阅读全文...
         </a>
     </div>

@@ -154,6 +154,56 @@
     <ul class="post-list">
     
         <li class="post-list-item">
+            <article id="post-java/spring/spring配置占位符源码解析"
+  class="article-card article-type-post" itemprop="blogPost">
+     
+    <div class="post-meta">
+        <time datetime="2019-07-23T06:06:39.000Z" itemprop="datePublished" class="post-time">
+  2019-07-23
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/dev-log/java/spring/spring配置占位符源码解析/">spring配置占位符替换源码解析</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+        今天搭建spring-boot项目启动时遇到一个问题：TDDL（淘宝内部使用的一款分库分表框架）DataSource无法找到MySQL配置，仔细观察日志发现是XML文件中spring bean的占位符，如${za.castle.bastion.tddl.appname}未被正确替换，运行时还是原来的带$符号的原字符串。
+不得不承认，很多时候，我们的代码都是从其他同类项目复制过来的，遇到问题时...
+    
+    
+        <a href="/dev-log/java/spring/spring配置占位符源码解析/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读源码/">读源码</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item">
             <article id="post-java/连接池误用引发的服务失去响应"
   class="article-card article-type-post" itemprop="blogPost">
      
@@ -612,61 +662,6 @@
     
     
         <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/8线程池的使用/" class="post-more waves-effect waves-button">
-            阅读全文...
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/多线程/">多线程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/dev-log/tags/读书笔记/">读书笔记</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item">
-            <article id="post-java/concurrency/Java并发编程实战学习笔记/7取消与关闭"
-  class="article-card article-type-post" itemprop="blogPost">
-     
-    <div class="post-meta">
-        <time datetime="2017-08-08T16:00:00.000Z" itemprop="datePublished" class="post-time">
-  2017-08-09
-</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/dev-log/categories/Java/">Java</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/dev-log/java/concurrency/Java并发编程实战学习笔记/7取消与关闭/">取消与关闭</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent" >
-
-    
-        取消与关闭这一章超难，暂时读不懂。
-要使线程安全、快速、可靠地停止下来，并不是一件容易的事，Java没有提供任何机制来安全地终止线程。但Java提供了中断（Interruption），这是一种协作机制，能够使一个线程终止另一个线程的当前工作。
-一个行为良好的软件，与勉强运行的软件之间的最主要区别就是，行为良好的软件能很完善地处理失败、关闭和取消等过程。
-任务取消取消的原因：
-
-用户请求取消
-...
-    
-    
-        <a href="/dev-log/java/concurrency/Java并发编程实战学习笔记/7取消与关闭/" class="post-more waves-effect waves-button">
             阅读全文...
         </a>
     </div>
